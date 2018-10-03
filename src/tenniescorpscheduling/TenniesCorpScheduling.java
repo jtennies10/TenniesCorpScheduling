@@ -15,7 +15,13 @@ public class TenniesCorpScheduling {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        try {
+            DBConnection.makeConnection();
+
+            DBConnection.closeConnection();
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
-    
 }
