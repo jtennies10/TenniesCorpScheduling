@@ -16,9 +16,9 @@ public class TenniesCorpScheduling {
      */
     public static void main(String[] args) {
         try {
-            DBConnection.makeConnection();
+            DatabaseConnection.makeConnection();
 
-            DBConnection.closeConnection();
+            DatabaseConnection.closeConnection();
 
         } catch(Exception e) {
             e.printStackTrace();

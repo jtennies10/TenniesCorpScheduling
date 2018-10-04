@@ -6,13 +6,19 @@
 package tenniescorpscheduling;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  *
  * @author Joshua Tennies
  */
 public class DataRetriever {
-    public static ResultSet getUserInfo() {
+    public static ResultSet getUserInfo(String userName, String password) throws SQLException {
+        Statement stmt = DatabaseConnection.getConn().createStatement();
+        stmt.executeQuery(String.format("SELECT * FROM user WHERE userName='%s' AND password='%s'", 
+                userName, password));
+        
         return null;
     }
 }
