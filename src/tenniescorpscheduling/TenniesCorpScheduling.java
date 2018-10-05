@@ -21,23 +21,55 @@ public class TenniesCorpScheduling {
         //Comment/Uncomment the locale instantiations to change the language
         Locale locale = Locale.getDefault();
         //Locale locale = new Locale("es");
-        
+
         ResourceBundle rb = ResourceBundle.getBundle("res.Login", locale);
-        
+
         System.out.println(rb.getString("welcome"));
         System.out.println(rb.getString("login"));
 
         User currentUser = null;
         do {
             currentUser = Login.attemptLogIn(rb);
-            
-            if(currentUser == null) {
+
+            if (currentUser == null) {
                 System.out.println(rb.getString("invalid"));
             }
-        
-        } while(currentUser == null);
-        
+
+        } while (currentUser == null);
+
         System.out.println(rb.getString("success"));
+
+        printGeneralOptions();
+
+        int generalChoice = -1;
+        do {
+            generalChoice = currentUser.getUserChoice();
+            switch (generalChoice) {
+                case 1:
+                //Customer options
+                    System.out.println("Customer options chosen");
+                case 2:
+                //appointment options
+                case 3:
+                //calendar options
+                case 4:
+                //report options
+                case 5:
+                //exit program
+                default:
+                //invalid value entered
+            }
+        } while (generalChoice != 5);
+
+    }
+
+    private static void printGeneralOptions() {
+        System.out.println("\n\nOptions Menu");
+        System.out.println("1. Customer Options");
+        System.out.println("2. Appointment Options");
+        System.out.println("3. View calendar");
+        System.out.println("4. Generate report");
+        System.out.println("5. Log out");
     }
 
 }

@@ -4,6 +4,8 @@
  */
 package tenniescorpscheduling;
 
+import java.util.Scanner;
+
 /**
  *
  * @author Joshua
@@ -11,6 +13,7 @@ package tenniescorpscheduling;
 class User {
     private int userid;
     private String userName;
+    private Scanner sc = new Scanner(System.in);
 
     public User(int userid, String userName) {
         this.userid = userid;
@@ -23,6 +26,11 @@ class User {
 
     public String getUserName() {
         return userName;
+    }
+    
+    public int getUserChoice() {
+        System.out.print("Choice: ");
+        return sc.nextInt();
     }
 
     

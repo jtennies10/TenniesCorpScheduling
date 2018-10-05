@@ -46,7 +46,6 @@ public class Login {
             
         } catch(ClassNotFoundException | SQLException e) {
             System.out.println(rb.getString("error"));
-            return null;
         } 
         
         return null;
@@ -54,13 +53,13 @@ public class Login {
     
     
     public static String getLogInUserName(ResourceBundle rb) {
-        System.out.println(rb.getString("username"));
+        System.out.print(rb.getString("username"));
         return sc.nextLine();
 
     }
 
     public static String getLogInPassword(ResourceBundle rb) {
-        System.out.println(rb.getString("password"));
+        System.out.print(rb.getString("password"));
         return sc.nextLine();
     }
     
