@@ -8,19 +8,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 
-public class DataRetriever {
+public class Login {
     
+    static Scanner sc = new Scanner(System.in);
     //private constructor so the class is not instantiated
-    private DataRetriever() {}
+    private Login() {}
     
-    public static User attemptLogIn(String userName, String password, 
-            ResourceBundle rb) {
+    public static User attemptLogIn(ResourceBundle rb) {
+        String userName = getLogInUserName(rb);
+        String password = getLogInPassword(rb);
         
         try {
             DatabaseConnection.makeConnection();
         } catch(ClassNotFoundException | SQLException e) {
-            //System.out.println("Error communicating with the database");
             System.out.println(rb.getString("error"));
             return null;
         }
@@ -43,12 +45,23 @@ public class DataRetriever {
             DatabaseConnection.closeConnection();
             
         } catch(ClassNotFoundException | SQLException e) {
-            //System.out.println("Error communicating with the database");
             System.out.println(rb.getString("error"));
             return null;
         } 
         
         return null;
+    }
+    
+    
+    public static String getLogInUserName(ResourceBundle rb) {
+        System.out.println(rb.getString("username"));
+        return sc.nextLine();
+
+    }
+
+    public static String getLogInPassword(ResourceBundle rb) {
+        System.out.println(rb.getString("password"));
+        return sc.nextLine();
     }
     
     /*

@@ -24,39 +24,20 @@ public class TenniesCorpScheduling {
         
         ResourceBundle rb = ResourceBundle.getBundle("res.Login", locale);
         
-        
-        //System.out.println("Welcome to TenniesCorp Scheduling!");
         System.out.println(rb.getString("welcome"));
-        //System.out.println("Please log in below.");
         System.out.println(rb.getString("login"));
 
         User currentUser = null;
         do {
-            currentUser = DataRetriever.attemptLogIn(getLogInUserName(rb), 
-                    getLogInPassword(rb), rb);
+            currentUser = Login.attemptLogIn(rb);
             
             if(currentUser == null) {
-                //System.out.println("Invalid username and password. "
-                       // + "Please try again");
                 System.out.println(rb.getString("invalid"));
             }
         
         } while(currentUser == null);
         
-        //System.out.println("Log In successful!");
         System.out.println(rb.getString("success"));
     }
 
-    public static String getLogInUserName(ResourceBundle rb) {
-        //System.out.print("Username: ");
-        System.out.println(rb.getString("username"));
-        return sc.nextLine();
-
-    }
-
-    public static String getLogInPassword(ResourceBundle rb) {
-        //System.out.print("Password: ");
-        System.out.println(rb.getString("password"));
-        return sc.nextLine();
-    }
 }
