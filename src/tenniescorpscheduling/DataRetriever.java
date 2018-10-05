@@ -7,18 +7,21 @@ package tenniescorpscheduling;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ResourceBundle;
 
 public class DataRetriever {
     
     //private constructor so the class is not instantiated
     private DataRetriever() {}
     
-    public static User attemptLogIn(String userName, String password) {
+    public static User attemptLogIn(String userName, String password, 
+            ResourceBundle rb) {
         
         try {
             DatabaseConnection.makeConnection();
         } catch(ClassNotFoundException | SQLException e) {
-            System.out.println("Error connecting to the database");
+            //System.out.println("Error communicating with the database");
+            System.out.println(rb.getString("error"));
             return null;
         }
         
@@ -29,15 +32,19 @@ public class DataRetriever {
             while(rs.next()) {
                 if(rs.getString("userName").equals(userName)
                         && rs.getString("password").equals(password)) {
-                    return new User(rs.getInt("userid"), rs.getString("userName")); 
+                    int userid = rs.getInt("userid");
+                    String username = rs.getString("userName");
+                    
+                    DatabaseConnection.closeConnection();
+                    return new User(userid, username); 
                 }
             }   
 
             DatabaseConnection.closeConnection();
             
         } catch(ClassNotFoundException | SQLException e) {
-            System.out.println("There was a problem communicating with the database.");
-            System.out.println(e.getMessage());
+            //System.out.println("Error communicating with the database");
+            System.out.println(rb.getString("error"));
             return null;
         } 
         
@@ -55,8 +62,6 @@ public class DataRetriever {
         
         ResultSet rs = stmt.executeQuery(String.format("select * from user where userName='%s' AND password='%s'", 
                 userName, password));
-        System.out.printf("SELECT * FROM user WHERE userName='%s' AND password='%s'", 
-                userName, password);
         
         return rs;
     }
