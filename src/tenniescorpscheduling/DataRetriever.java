@@ -1,5 +1,5 @@
 /*
- * Class used to retrieve data from the database with help from the 
+ * Class used to interact with data from the database with help from the 
  * DatabaseConnection class.
  */
 package tenniescorpscheduling;
