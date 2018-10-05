@@ -1,9 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Contains the program main method and controls the program.
  */
 package tenniescorpscheduling;
+
+import java.sql.ResultSet;
+import java.util.Scanner;
 
 /**
  *
@@ -11,17 +12,36 @@ package tenniescorpscheduling;
  */
 public class TenniesCorpScheduling {
 
-    /**
-     * @param args the command line arguments
-     */
+    static Scanner sc = new Scanner(System.in);
+
     public static void main(String[] args) {
-        try {
-            DatabaseConnection.makeConnection();
+        System.out.println("Welcome to TenniesCorp Scheduling!");
+        System.out.println("Please log in below.");
 
-            DatabaseConnection.closeConnection();
+        User currentUser = null;
+        do {
+            currentUser = DataRetriever.attemptLogIn(getLogInUserName(), 
+                    getLogInPassword());
+            
+            if(currentUser == null) {
+                System.out.println("Invalid username and password. "
+                        + "Please try again");
+            }
+        
+        } while(currentUser == null);
+        
+        System.out.println("Log In successful!");
+        
+    }
 
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+    public static String getLogInUserName() {
+        System.out.print("Username: ");
+        return sc.nextLine();
+
+    }
+
+    public static String getLogInPassword() {
+        System.out.print("Password: ");
+        return sc.nextLine();
     }
 }

@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Class used to connect to the database.
  */
 package tenniescorpscheduling;
 
@@ -20,13 +18,13 @@ public class DatabaseConnection {
     private static final String driver = "com.mysql.jdbc.Driver";
     private static Connection conn;
     
-    public static void makeConnection() throws ClassNotFoundException, SQLException, Exception {
+    public static void makeConnection() throws ClassNotFoundException, SQLException {
         Class.forName(driver);
         conn = DriverManager.getConnection(dbURL, username, password);
         System.out.println("Connection successful!");
     }
     
-    public static void closeConnection() throws ClassNotFoundException, SQLException, Exception {
+    public static void closeConnection() throws ClassNotFoundException, SQLException {
         conn.close();
         System.out.println("Connection closed!");
     }
