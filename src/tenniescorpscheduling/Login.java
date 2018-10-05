@@ -16,6 +16,11 @@ public class Login {
     //private constructor so the class is not instantiated
     private Login() {}
     
+    /*
+    *Attempts to log the user in by obtaining the username and password
+    *combo from the database.
+    @return null if user not found, user object if found
+    */
     public static User attemptLogIn(ResourceBundle rb) {
         String userName = getLogInUserName(rb);
         String password = getLogInPassword(rb);
@@ -29,7 +34,8 @@ public class Login {
         
         try(Statement stmt = DatabaseConnection.getConn().createStatement()) {
             
-            ResultSet rs = getUserInfo(stmt, userName, password);
+            ResultSet rs = stmt.executeQuery(String.format("select * from user where userName='%s' AND password='%s'", 
+                userName, password));
             
             while(rs.next()) {
                 if(rs.getString("userName").equals(userName)
@@ -62,21 +68,5 @@ public class Login {
         System.out.print(rb.getString("password"));
         return sc.nextLine();
     }
-    
-    /*
-    Gets the user info entered based on the passed in arguments.
-    @param userName the username of the user attempting to log in
-    @param password the password of the user attempting to log in
-    @return the ResultSet found by the query
-    */
-    private static ResultSet getUserInfo(Statement stmt, String userName, String password) throws SQLException, ClassNotFoundException {
-
-        
-        ResultSet rs = stmt.executeQuery(String.format("select * from user where userName='%s' AND password='%s'", 
-                userName, password));
-        
-        return rs;
-    }
-    
     
 }
