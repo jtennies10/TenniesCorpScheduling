@@ -47,15 +47,22 @@ public class TenniesCorpScheduling {
             switch (generalChoice) {
                 case 1:
                 //Customer options
-                    System.out.println("Customer options chosen");
+                    Customers.printCustomerOptions();
+                    int choice = currentUser.getUserChoice();
+                    Customers.executeCustomerChoice(choice);
+                    break;
                 case 2:
                 //appointment options
+                    break;
                 case 3:
                 //calendar options
+                    break;
                 case 4:
                 //report options
+                    break;
                 case 5:
                 //exit program
+                    break;
                 default:
                 //invalid value entered
             }
