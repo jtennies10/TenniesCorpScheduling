@@ -116,6 +116,7 @@ public class Customers {
                 return false;
             }
             
+            //store address id for updating address table
             int customerAddressId = rs.getInt("addressId");
             
             //ask for updated field
@@ -167,15 +168,33 @@ public class Customers {
     }
     
     public static boolean addCustomer(User currentUser) {
+        //get customer info
+        //get address info
+        //make sure to set creation and updated fields
+        
         return false;
     }
     
     public static boolean deleteCustomer() {
+        //get cutomerid
+        //delete if customer exists
+        
+        
         return false;
     }
     
-    public static boolean findCustomer(int customerid) {
-        return false;
+    public static boolean findCustomer(Statement stmt, int customerid) throws SQLException {
+        boolean customerFound = false;
+        
+        ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM customer"
+                + "WHERE customerid='%s'", customerid));
+        
+        if(rs.next()) {
+            customerFound = true;    
+        }
+        
+        rs.close();
+        return customerFound;
     }
     
     private static void printCustomerRecord(String customerid, String customerName,
