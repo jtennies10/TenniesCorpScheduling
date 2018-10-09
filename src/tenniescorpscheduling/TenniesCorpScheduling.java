@@ -49,7 +49,7 @@ public class TenniesCorpScheduling {
                 //Customer options
                     Customers.printCustomerOptions();
                     int choice = currentUser.getUserChoice();
-                    Customers.executeCustomerChoice(choice);
+                    Customers.executeCustomerChoice(choice, currentUser);
                     break;
                 case 2:
                 //appointment options
