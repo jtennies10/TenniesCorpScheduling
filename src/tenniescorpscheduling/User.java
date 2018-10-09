@@ -20,7 +20,7 @@ class User {
         this.userName = userName;
     }
 
-    public int getUserid() {
+    public int getUserId() {
         return userid;
     }
 
@@ -30,7 +30,7 @@ class User {
     
     public int getUserChoice() {
         System.out.print("Choice: ");
-        return sc.nextInt();
+        return Integer.parseInt(sc.nextLine());
     }
 
     
