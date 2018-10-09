@@ -32,7 +32,7 @@ public class Customers {
         switch (userChoice) {
             case 1:
                 //view customers
-                //viewCustomers();
+                viewCustomers();
                 break;
             case 2:
                 //add customer
@@ -61,39 +61,45 @@ public class Customers {
     }
 
     //TODO: Update to new ERD
-//    public static void viewCustomers() {
-//        try {
-//            DatabaseConnection.makeConnection();
-//        } catch (ClassNotFoundException | SQLException e) {
-//            System.out.println("Error cocmmunicating with the database.");
-//        }
-//
-//        try (Statement stmt = DatabaseConnection.getConn().createStatement()) {
-//
-//            ResultSet rs = stmt.executeQuery("SELECT * FROM customer");
-//
-//            printCustomerRecord("Customer ID", "Customer Name", "Address ID",
-//                    "Last Update By");
-//            //add a line for separting the header from the records
-//            System.out.println("----------------------------------------------"
-//                    + "--------------------------------------------------------"
-//                    + "--------------------------------------------------------"
-//                    + "------------------------------");
-//
-//            while (rs.next()) {
-//                //print out each customer info
-//                printCustomerRecord(String.valueOf(rs.getInt("customerid")),
-//                        rs.getString("customerName"), String.valueOf(rs.getInt("addressId")),
-//                        rs.getString("lastUpdateBy"));
-//
-//            }
-//
-//            DatabaseConnection.closeConnection();
-//
-//        } catch (ClassNotFoundException | SQLException e) {
-//            System.out.println("Error communicating with the database.");
-//        }
-//    }
+    public static void viewCustomers() {
+        try {
+            DatabaseConnection.makeConnection();
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error cocmmunicating with the database.");
+        }
+
+        try (Statement stmt = DatabaseConnection.getConn().createStatement()) {
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM customer INNER JOIN address "
+                    + "ON customer.addressId = address.addressId INNER JOIN city ON "
+                    + "address.cityId = city.cityId INNER JOIN country ON "
+                    + "city.countryId = country.countryId");
+
+            printCustomerRecord("Customer ID", "Customer Name", "Address ID",
+                    "Address", "City ID", "City", "Country ID", "Country");
+            //add a line for separting the header from the records
+            System.out.println("----------------------------------------------"
+                    + "--------------------------------------------------------"
+                    + "--------------------------------------------------------"
+                    + "--------------------------------------------------------");
+
+            while (rs.next()) {
+                //print out each customer info
+                printCustomerRecord(String.valueOf(rs.getInt("customerid")),
+                        rs.getString("customerName"), String.valueOf(rs.getInt("addressId")),
+                        rs.getString("address"), rs.getString("cityId"), rs.getString("city"),
+                        String.valueOf(rs.getString("countryId")), rs.getString("country"));
+
+            }
+
+            DatabaseConnection.closeConnection();
+
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error communicating with the database.");
+            System.out.println(e.getMessage());
+        }
+    }
+   
     //TODO: Update to new ERD
 //    public static boolean updateCustomer(User currentUser) {
 //        try {
@@ -320,9 +326,9 @@ public class Customers {
     }
 
     private static void printCustomerRecord(String customerid, String customerName,
-            String addressId, String lastUpdateBy) {
-        System.out.printf("%-40s| %-40s| %-45s| %-40s\n", customerid, customerName,
-                addressId, lastUpdateBy);
+            String addressId, String address, String cityId, String city, String countryId, String country) {
+        System.out.printf("%-12s| %-45s| %-12s| %-50s| %-12s| %-50s| %-12s| %-50s|\n",
+                customerid, customerName, addressId, address, cityId, city, countryId, country);
     }
 
     private static void addAddress(Statement stmt, int addressId, String address, int cityId, String postalCode,
