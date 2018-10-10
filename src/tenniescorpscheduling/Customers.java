@@ -44,11 +44,11 @@ public class Customers {
                 break;
             case 3:
                 //update customer
-//                if (updateCustomer(currentUser)) {
-//                    System.out.println("Customer updated successfully");
-//                } else {
-//                    System.out.println("Customer update failed");
-//                }
+                if (updateCustomer(currentUser)) {
+                    System.out.println("Customer updated successfully");
+                } else {
+                    System.out.println("Customer update failed");
+                }
                 break;
             case 4:
                 //delete customer
@@ -99,104 +99,121 @@ public class Customers {
             System.out.println(e.getMessage());
         }
     }
-   
-    //TODO: Update to new ERD
-//    public static boolean updateCustomer(User currentUser) {
-//        try {
-//            DatabaseConnection.makeConnection();
-//        } catch (ClassNotFoundException | SQLException e) {
-//            System.out.println("Error cocmmunicating with the database.");
-//            return false;
-//        }
-//
-//        try (Statement stmt = DatabaseConnection.getConn().createStatement()) {
-//            String currentUserName = currentUser.getUserName();
-//
-//            //ask for customer id
-//            System.out.print("Enter the ID of the customer you would like to update: ");
-//            int customerid = sc.nextInt();
-//            sc.nextLine(); //moves past enter character in input stream
-//
-//            //check if customer exists
-//            ResultSet rs = stmt.executeQuery(
-//                    String.format("SELECT * FROM customer where customerid=%d", customerid));
-//
-//            if (!rs.first()) { //then there is no result
-//                System.out.println("No customer exists with that ID.");
-//                return false;
-//            }
-//
-//            //store address id for updating address table
-//            int customerAddressId = rs.getInt("addressId");
-//
-//            //acquire updated customer table fields
-//            System.out.print("Enter customer name: ");
-//            String newName = sc.nextLine();
-//
-//            //update customer table
-//            int result = stmt.executeUpdate(String.format("UPDATE customer"
-//                    + " SET customerName='%s', lastUpdate=NOW(), lastUpdateBy='%s'"
-//                    + " WHERE customerid=%d", newName, currentUserName, customerid));
-//
-//            if (result != 1) {
-//                return false;
-//            }
-//
-//            System.out.print("Enter customer address: ");
-//            String newAddress = sc.nextLine();
-//
-//            System.out.print("Enter customer address 2(or enter for none): ");
-//            String newAddress2 = sc.nextLine();
-//            if (newAddress2.isEmpty()) {
-//                newAddress2 = " ";
-//            }
-//
-//            System.out.print("Enter customer postal code: ");
-//            String newPostalCode = sc.nextLine();
-//
-//            System.out.print("Enter customer phone: ");
-//            String newPhoneNumber = sc.nextLine();
-//
-//            result = stmt.executeUpdate(String.format("UPDATE address SET"
-//                    + " address='%s', address2='%s', postalCode='%s', phone='%s'"
-//                    + ", lastUpdate=NOW(), lastUpdateBy='%s' WHERE addressId=%d",
-//                    newAddress, newAddress2, postalCode, newPhoneNumber, currentUserName,
-//                    customerAddressId));
-//
-//            if (result != 1) {
-//                return false;
-//            }
-//
-//            //acquire updated city fields
-//            System.out.print("Enter customer city: ");
-//            String newCity = sc.nextLine();
-//
-//            result = stmt.executeUpdate(String.format("UPDATE address SET"
-//                    + " address='%s', address2='%s', postalCode='%s', phone='%s'"
-//                    + ", lastUpdate=NOW(), lastUpdateBy='%s' WHERE addressId=%d",
-//                    newAddress, newAddress2, postalCode, newPhoneNumber, currentUserName,
-//                    customerAddressId));
-//
-//            if (result != 1) {
-//                return false;
-//            }
-//
-//            //acquire updated country fields
-//            if (result != 1) {
-//                return false;
-//            }
-//
-//            //close the connection
-//            DatabaseConnection.closeConnection();
-//
-//        } catch (ClassNotFoundException | SQLException e) {
-//            System.out.println("Error communicating with the database.");
-//            System.out.println(e.getMessage());
-//            return false;
-//        }
-//
-//        return true;
-//    }
+ 
+    public static boolean updateCustomer(User currentUser) {
+        try {
+            DatabaseConnection.makeConnection();
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error cocmmunicating with the database.");
+            return false;
+        }
+
+        try (Statement stmt = DatabaseConnection.getConn().createStatement()) {
+            String currentUserName = currentUser.getUserName();
+
+            //ask for customer id
+            System.out.print("Enter the ID of the customer you would like to update: ");
+            int customerid = Integer.parseInt(sc.nextLine());
+
+            //check if customer exists
+            ResultSet rs = stmt.executeQuery(
+                    String.format("SELECT * FROM customer where customerId=%d", customerid));
+
+            if (!rs.first()) { //then there is no result
+                System.out.println("No customer exists with that ID.");
+                return false;
+            }
+
+            //at this point the customerid must exist
+            //acquire updated customer table fields for all tables
+            System.out.print("Enter customer name: ");
+            String newName = sc.nextLine();
+            
+            System.out.print("Enter customer addressId: ");
+            int newAddressId = Integer.parseInt(sc.nextLine());
+
+
+            //check if the customerAddressId already exists for an address record,
+            //if so return true
+            rs = stmt.executeQuery(String.format("SELECT * FROM address WHERE "
+                    + "addressId=%d", newAddressId));
+
+            if (!rs.next()) { //then an address was not found and needs created
+
+                System.out.println("Address Id does not exist, a new address must be created");
+
+                System.out.print("Enter address: ");
+                String newAddress = sc.nextLine();
+
+                System.out.print("Enter cityId: ");
+                int newCityId = Integer.parseInt(sc.nextLine());
+
+                System.out.print("Enter postal code: ");
+                String newPostalCode = sc.nextLine();
+
+                System.out.print("Enter phone: ");
+                String newPhone = sc.nextLine();
+
+                //check if the cityId already exists for a city record,
+                //if so return true
+                rs = stmt.executeQuery(String.format("SELECT * FROM city WHERE "
+                        + "cityId=%d", newCityId));
+
+                if (!rs.next()) { //then a city was not found and needs created
+
+                    System.out.println("City Id does not exist, a new city must be created");
+
+                    System.out.print("Enter city: ");
+                    String newCity = sc.nextLine();
+
+                    System.out.print("Enter countryId: ");
+                    int newCountryId = Integer.parseInt(sc.nextLine());
+
+                    //check if the countryId already exists for a country record,
+                    //if so return true
+                    rs = stmt.executeQuery(String.format("SELECT * FROM country WHERE "
+                            + "countryId=%d", newCountryId));
+
+                    if (!rs.next()) { //then a country was not found and needs created
+
+                        System.out.println("City Id does not exist, a new country must be created");
+
+                        System.out.print("Enter country: ");
+                        String newCountry = sc.nextLine();
+                        
+                        addCountry(stmt, newCountryId, newCountry, currentUser);
+
+                    }
+                    
+                    //the city can now be added since country has been added
+                    addCity(stmt, newCityId, newCity, newCountryId, currentUser);
+                    
+                }
+                
+                //the address can now be added since city has been added
+                addAddress(stmt, newAddressId, newAddress, newCityId, newPostalCode, newPhone, currentUser);
+                
+            }
+            
+            //update customer table
+            int result = stmt.executeUpdate(String.format("UPDATE customer"
+                    + " SET customerName='%s', addressId=%d, lastUpdate=NOW(), lastUpdateBy='%s'"
+                    + " WHERE customerid=%d", newName, newAddressId, currentUserName, customerid));
+
+            if (result != 1) return false;
+
+            //close the connection
+            DatabaseConnection.closeConnection();
+
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error communicating with the database.");
+            System.out.println(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+    
     public static boolean addCustomer(User currentUser) {
         try {
             DatabaseConnection.makeConnection();
@@ -214,17 +231,12 @@ public class Customers {
             System.out.print("Enter customer address id: ");
             int customerAddressId = Integer.parseInt(sc.nextLine());
 
-            //check if the customerAddressId already exists for an address record,
-            //if so return true
+            //check if the customerAddressId already exists for an address record
             ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM address WHERE "
                     + "addressId=%d", customerAddressId));
 
-            if (rs.next()) { //then an address was found
-                System.out.println("Address found.");
-            } else {
+            if (!rs.next()) { //then an address was not found and needs created
 
-                //at this point the addressId, does not exist and an address record 
-                //must be created
                 System.out.println("Address Id does not exist, a new address must be created");
 
                 System.out.print("Enter address: ");
@@ -239,17 +251,12 @@ public class Customers {
                 System.out.print("Enter phone: ");
                 String phone = sc.nextLine();
 
-                //check if the cityId already exists for a city record,
-                //if so return true
+                //check if the cityId already exists for a city record
                 rs = stmt.executeQuery(String.format("SELECT * FROM city WHERE "
                         + "cityId=%d", cityId));
 
-                if (rs.next()) { //then a city was found
-                    System.out.println("City found");;
-                } else {
+                if (!rs.next()) { //then a city was not found and needs created
 
-                    //at this point the countryId, does not exist and a country record 
-                    //must be created
                     System.out.println("City Id does not exist, a new city must be created");
 
                     System.out.print("Enter city: ");
@@ -258,17 +265,12 @@ public class Customers {
                     System.out.print("Enter countryId: ");
                     int countryId = Integer.parseInt(sc.nextLine());
 
-                    //check if the countryId already exists for a country record,
-                    //if so return true
+                    //check if the countryId already exists for a country record
                     rs = stmt.executeQuery(String.format("SELECT * FROM country WHERE "
                             + "countryId=%d", countryId));
 
-                    if (rs.next()) { //then a country was found
-                        System.out.println("Country found");
-                    } else {
+                    if (!rs.next()) { //then a country was not found and needs created
 
-                        //at this point the countryId, does not exist and a country record 
-                        //must be created
                         System.out.println("City Id does not exist, a new country must be created");
 
                         System.out.print("Enter country: ");
