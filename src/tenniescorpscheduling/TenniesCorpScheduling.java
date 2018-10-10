@@ -39,10 +39,10 @@ public class TenniesCorpScheduling {
 
         System.out.println(rb.getString("success"));
 
-        printGeneralOptions();
-
         int generalChoice = -1;
         do {
+            
+            printGeneralOptions();
             generalChoice = currentUser.getUserChoice();
             switch (generalChoice) {
                 case 1:
