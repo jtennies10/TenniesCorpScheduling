@@ -52,7 +52,11 @@ public class Customers {
                 break;
             case 4:
                 //delete customer
-                deleteCustomer();
+                if(deleteCustomer()) {
+                    System.out.println("Customer deleted successfully");
+                } else {
+                    System.out.println("Customer delete failed");
+                }
                 break;
             default:
                 System.out.println("Invalid choice, returning to general options");
@@ -99,7 +103,7 @@ public class Customers {
             System.out.println(e.getMessage());
         }
     }
- 
+
     public static boolean updateCustomer(User currentUser) {
         try {
             DatabaseConnection.makeConnection();
@@ -116,10 +120,7 @@ public class Customers {
             int customerid = Integer.parseInt(sc.nextLine());
 
             //check if customer exists
-            ResultSet rs = stmt.executeQuery(
-                    String.format("SELECT * FROM customer where customerId=%d", customerid));
-
-            if (!rs.first()) { //then there is no result
+            if (!findCustomer(stmt, customerid)) {
                 System.out.println("No customer exists with that ID.");
                 return false;
             }
@@ -128,14 +129,13 @@ public class Customers {
             //acquire updated customer table fields for all tables
             System.out.print("Enter customer name: ");
             String newName = sc.nextLine();
-            
+
             System.out.print("Enter customer addressId: ");
             int newAddressId = Integer.parseInt(sc.nextLine());
 
-
             //check if the customerAddressId already exists for an address record,
             //if so return true
-            rs = stmt.executeQuery(String.format("SELECT * FROM address WHERE "
+            ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM address WHERE "
                     + "addressId=%d", newAddressId));
 
             if (!rs.next()) { //then an address was not found and needs created
@@ -180,27 +180,29 @@ public class Customers {
 
                         System.out.print("Enter country: ");
                         String newCountry = sc.nextLine();
-                        
+
                         addCountry(stmt, newCountryId, newCountry, currentUser);
 
                     }
-                    
+
                     //the city can now be added since country has been added
                     addCity(stmt, newCityId, newCity, newCountryId, currentUser);
-                    
+
                 }
-                
+
                 //the address can now be added since city has been added
                 addAddress(stmt, newAddressId, newAddress, newCityId, newPostalCode, newPhone, currentUser);
-                
+
             }
-            
+
             //update customer table
             int result = stmt.executeUpdate(String.format("UPDATE customer"
                     + " SET customerName='%s', addressId=%d, lastUpdate=NOW(), lastUpdateBy='%s'"
                     + " WHERE customerid=%d", newName, newAddressId, currentUserName, customerid));
 
-            if (result != 1) return false;
+            if (result != 1) {
+                return false;
+            }
 
             //close the connection
             DatabaseConnection.closeConnection();
@@ -213,7 +215,7 @@ public class Customers {
 
         return true;
     }
-    
+
     public static boolean addCustomer(User currentUser) {
         try {
             DatabaseConnection.makeConnection();
@@ -275,25 +277,25 @@ public class Customers {
 
                         System.out.print("Enter country: ");
                         String country = sc.nextLine();
-                        
+
                         addCountry(stmt, countryId, country, currentUser);
 
                     }
-                    
+
                     //the city can now be added since country has been added
                     addCity(stmt, cityId, city, countryId, currentUser);
                 }
-                
+
                 //the address can now be added since city has been added
                 addAddress(stmt, customerAddressId, address, cityId, postalCode, phone, currentUser);
             }
-            
+
             //add customer to the database
             stmt.executeUpdate(String.format("INSERT INTO customer(customerName, "
                     + "addressId, active, createDate, createdBy, lastUpdateBy) "
                     + "VALUES('%s', %d, 1, NOW(), '%s', '%s')", customerName,
                     customerAddressId, currentUser.getUserName(), currentUser.getUserName()));
-            
+
             //close the connection
             DatabaseConnection.closeConnection();
 
@@ -307,17 +309,43 @@ public class Customers {
     }
 
     public static boolean deleteCustomer() {
-        //get cutomerid
-        //delete if customer exists
+        //open database connection
+        try {
+            DatabaseConnection.makeConnection();
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error cocmmunicating with the database.");
+            return false;
+        }
 
-        return false;
+        try (Statement stmt = DatabaseConnection.getConn().createStatement()) {
+            //get cutomerid
+            System.out.print("Enter ID of the customer you would like to delete:  ");
+            int customerid = Integer.parseInt(sc.nextLine());
+            
+            if(!findCustomer(stmt, customerid)) {
+                System.out.println("No customer exists with that ID.");
+                return false;
+            }
+            
+            //at this point, the customerid must exist
+            stmt.executeUpdate(String.format("DELETE FROM customer WHERE customerId=%d", customerid));
+            
+            DatabaseConnection.closeConnection();
+            
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error communicating with the database.");
+            System.out.println(e.getMessage());
+            return false;
+        }
+        
+        return true;
     }
 
     public static boolean findCustomer(Statement stmt, int customerid) throws SQLException {
         boolean customerFound = false;
 
-        ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM customer"
-                + "WHERE customerId='%s'", customerid));
+        ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM customer "
+                + "WHERE customerId=%d", customerid));
 
         if (rs.next()) {
             customerFound = true;
