@@ -177,7 +177,7 @@ public class Appointments {
         return true;
     }
 
-    public static boolean updateAppointment(User CurrentUser) {
+    public static boolean updateAppointment(User currentUser) {
         try {
             DatabaseConnection.makeConnection();
         } catch (ClassNotFoundException | SQLException e) {
@@ -185,7 +185,51 @@ public class Appointments {
         }
 
         try (Statement stmt = DatabaseConnection.getConn().createStatement()) {
+            
+            System.out.print("Enter appointment ID: ");
+            int appointmentId = Integer.parseInt(sc.nextLine());
+            
+            if(!findAppointment(stmt, appointmentId)) {
+                System.out.println("No appointment exists with that ID.");
+                return false;
+            }
+            
+            System.out.print("Enter new appointment title: ");
+            String newTitle = sc.nextLine();
 
+            System.out.print("Enter new appointment description: ");
+            String newDescription = sc.nextLine();
+            
+            System.out.print("Enter new appointment location: ");
+            String newLocation = sc.nextLine();
+
+            String newType = getAppointmentType();
+            
+            //get the start time in UTC and then break it down into 
+            //localdate and localtime
+            ZonedDateTime newStart = getStartTimeInUTC();
+            LocalTime newStartTimeInUTC = newStart.toLocalTime();
+            LocalDate newDateInUTC = newStart.toLocalDate();
+            
+            //get appointment length and add it to startTimeInUTC
+            //to get endTimeInUTC
+            System.out.print("Enter length of appointment in minutes: ");
+            int newLengthInMinutes = Integer.parseInt(sc.nextLine());
+            LocalTime newEndTimeInUTC = newStartTimeInUTC.plusMinutes(newLengthInMinutes);
+            
+            
+            
+            
+            int result = stmt.executeUpdate(String.format(
+                    "UPDATE appointment SET title='%s', description='%s', location='%s', "
+                    + "type='%s', start='%s', end='%s', lastUpdate=NOW(), lastUpdateBy='%s' "
+                    + "WHERE appointmentId='%s'",
+                    newTitle, newDescription, newLocation, newType, 
+                    (newDateInUTC + " " + newStartTimeInUTC), (newDateInUTC + " " + newEndTimeInUTC), 
+                    currentUser.getUserName(), appointmentId));
+             
+            if(result != 1) return false;
+            
             DatabaseConnection.closeConnection();
 
         } catch (ClassNotFoundException | SQLException e) {
@@ -194,7 +238,7 @@ public class Appointments {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     public static boolean deleteAppointment() {
@@ -261,5 +305,18 @@ public class Appointments {
         
         //return the converted time
         return local.minusSeconds(offset.getTotalSeconds());
+    }
+    
+    private static boolean findAppointment(Statement stmt, int appointmentId) throws SQLException {
+        
+        boolean apptFound = false;
+        
+        ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM appointment WHERE "
+                + "appointmentId=%d", appointmentId));
+        
+        if(rs.first()) apptFound = true;
+        
+        return apptFound;
+                
     }
 }
