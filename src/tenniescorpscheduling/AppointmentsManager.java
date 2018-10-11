@@ -1,6 +1,6 @@
 /*
- * Defines Appointments class, used to add, update, delete, and
- * view Appointments.
+ * Defines AppointmentsManager class, used to add, update, delete, and
+ * view AppointmentsManager.
  */
 package tenniescorpscheduling;
 
@@ -19,11 +19,11 @@ import java.util.Scanner;
  *
  * @author Joshua
  */
-public class Appointments {
+public class AppointmentsManager {
 
     static Scanner sc = new Scanner(System.in);
 
-    private Appointments() {
+    private AppointmentsManager() {
     }
 
     public static void printAppointmentOptions() {
@@ -37,7 +37,7 @@ public class Appointments {
     public static void executeAppointmentChoice(int userChoice, User currentUser) {
         switch (userChoice) {
             case 1:
-                //view all Appointments
+                //view all AppointmentsManager
                 viewAllAppointments();
                 break;
             case 2:

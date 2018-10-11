@@ -10,11 +10,11 @@ import java.sql.Statement;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
-public class Login {
+public class LoginManager {
     
     static Scanner sc = new Scanner(System.in);
     //private constructor so the class is not instantiated
-    private Login() {}
+    private LoginManager() {}
     
     /*
     *Attempts to log the user in by obtaining the username and password

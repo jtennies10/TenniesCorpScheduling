@@ -49,15 +49,15 @@ public class TenniesCorpScheduling {
             switch (generalChoice) {
                 case 1:
                 //Customer options
-                    Customers.printCustomerOptions();
+                    CustomersManager.printCustomerOptions();
                     choice = currentUser.getUserChoice();
-                    Customers.executeCustomerChoice(choice, currentUser);
+                    CustomersManager.executeCustomerChoice(choice, currentUser);
                     break;
                 case 2:
                 //appointment options
-                    Appointments.printAppointmentOptions();
+                    AppointmentsManager.printAppointmentOptions();
                     choice = currentUser.getUserChoice();
-                    Appointments.executeAppointmentChoice(choice, currentUser);
+                    AppointmentsManager.executeAppointmentChoice(choice, currentUser);
                     break;
                 case 3:
                 //calendar options

@@ -13,11 +13,11 @@ import java.util.Scanner;
  *
  * @author Joshua
  */
-public class Customers {
+public class CustomersManager {
 
     static Scanner sc = new Scanner(System.in);
 
-    private Customers() {
+    private CustomersManager() {
     }
 
     public static void printCustomerOptions() {
