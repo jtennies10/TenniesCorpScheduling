@@ -69,7 +69,7 @@ public class Customers {
         try {
             DatabaseConnection.makeConnection();
         } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error cocmmunicating with the database.");
+            System.out.println("Error communicating with the database.");
         }
 
         try (Statement stmt = DatabaseConnection.getConn().createStatement()) {
@@ -108,7 +108,7 @@ public class Customers {
         try {
             DatabaseConnection.makeConnection();
         } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error cocmmunicating with the database.");
+            System.out.println("Error ccmmunicating with the database.");
             return false;
         }
 
@@ -220,7 +220,7 @@ public class Customers {
         try {
             DatabaseConnection.makeConnection();
         } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error cocmmunicating with the database.");
+            System.out.println("Error communicating with the database.");
             return false;
         }
 
@@ -313,7 +313,7 @@ public class Customers {
         try {
             DatabaseConnection.makeConnection();
         } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("Error cocmmunicating with the database.");
+            System.out.println("Error communicating with the database.");
             return false;
         }
 
