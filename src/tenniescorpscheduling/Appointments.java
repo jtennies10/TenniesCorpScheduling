@@ -250,6 +250,19 @@ public class Appointments {
 
         try (Statement stmt = DatabaseConnection.getConn().createStatement()) {
 
+            System.out.print("Enter appointment ID: ");
+            int appointmentId = Integer.parseInt(sc.nextLine());
+            
+            if(!findAppointment(stmt, appointmentId)) {
+                System.out.println("No appointment exists with that ID.");
+                return false;
+            }
+            
+            int result = stmt.executeUpdate(String.format(
+                    "DELETE FROM appointment WHERE appointmentId=%d", appointmentId));
+            
+            if(result != 1) return false;
+            
             DatabaseConnection.closeConnection();
 
         } catch (ClassNotFoundException | SQLException e) {
@@ -258,7 +271,7 @@ public class Appointments {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     private static void printAppointmentRecord(String appointmentId, String customerId, 
