@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -78,25 +79,33 @@ public class AppointmentsManager {
         }
     }
 
-    
-
-    
-
     public void viewAllAppointments(Statement stmt) throws SQLException {
 
         printAppointmentRecord("Appointment ID", "Customer ID", "Customer Name", "User ID",
                 "UserName", "Type", "Start", "End");
+        //add a line for separting the header from the records
+        System.out.println("----------------------------------------------"
+                + "--------------------------------------------------------"
+                + "--------------------------------------------------------"
+                + "--------------------------------------------------------");
 
         ResultSet rs = stmt.executeQuery("SELECT * FROM appointment INNER JOIN "
                 + "customer ON appointment.customerId=customer.customerId INNER JOIN "
                 + "user ON appointment.userId=user.userId");
 
         while (rs.next()) {
+            //convert stored UTC times to the users time zone
+            Timestamp storedStartTimeStamp = rs.getTimestamp("start");
+            LocalDateTime localStartDateTime = storedStartTimeStamp.toLocalDateTime();
+            
+            Timestamp storedEndTimeStamp = rs.getTimestamp("end");
+            LocalDateTime localEndDateTime = storedEndTimeStamp.toLocalDateTime();
+
             //print out each appointment record
             printAppointmentRecord(String.valueOf(rs.getInt("appointmentId")),
                     String.valueOf(rs.getInt("customerId")), rs.getString("customerName"),
                     String.valueOf(rs.getInt("userId")), rs.getString("userName"),
-                    rs.getString("type"), rs.getString("start"), rs.getString("end"));
+                    rs.getString("type"), localStartDateTime.toString(), localEndDateTime.toString());
         }
 
     }
