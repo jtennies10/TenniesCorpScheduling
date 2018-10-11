@@ -16,12 +16,13 @@ public class DatabaseConnection {
     private static final String username = "U05osu";
     private static final String password = "53688564723";
     private static final String driver = "com.mysql.jdbc.Driver";
-    private static Connection conn;
+    static Connection conn;
     
-    public static void makeConnection() throws ClassNotFoundException, SQLException {
+    public static Connection makeConnection() throws ClassNotFoundException, SQLException {
         Class.forName(driver);
         conn = DriverManager.getConnection(dbURL, username, password);
         System.out.println("Connection successful!");
+        return conn;
     }
     
     public static void closeConnection() throws ClassNotFoundException, SQLException {

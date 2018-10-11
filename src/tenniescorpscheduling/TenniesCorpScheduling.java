@@ -40,6 +40,11 @@ public class TenniesCorpScheduling {
 //        System.out.println(rb.getString("success"));
 
         User currentUser = new User(1, "jten");
+        
+        CustomersManager cm = new CustomersManager();
+        AppointmentsManager am = new AppointmentsManager();
+        
+        
         int generalChoice = -1;
         do {
             
@@ -49,15 +54,15 @@ public class TenniesCorpScheduling {
             switch (generalChoice) {
                 case 1:
                 //Customer options
-                    CustomersManager.printCustomerOptions();
+                    cm.printCustomerOptions();
                     choice = currentUser.getUserChoice();
-                    CustomersManager.executeCustomerChoice(choice, currentUser);
+                    cm.executeCustomerChoice(choice, currentUser);
                     break;
                 case 2:
                 //appointment options
-                    AppointmentsManager.printAppointmentOptions();
+                    am.printAppointmentOptions();
                     choice = currentUser.getUserChoice();
-                    AppointmentsManager.executeAppointmentChoice(choice, currentUser);
+                    am.executeAppointmentChoice(choice, currentUser);
                     break;
                 case 3:
                 //calendar options
