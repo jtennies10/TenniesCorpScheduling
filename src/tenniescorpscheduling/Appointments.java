@@ -79,17 +79,19 @@ public class Appointments {
 
         try (Statement stmt = DatabaseConnection.getConn().createStatement()) {
 
-            printAppointmentRecord("Appointment ID", "Customer ID", "User ID",
-                    "Title", "Location", "Type", "Start", "End");
+            printAppointmentRecord("Appointment ID", "Customer ID", "Customer Name", "User ID",
+                    "UserName", "Type", "Start", "End");
 
-            ResultSet rs = stmt.executeQuery("SELECT * FROM appointment");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM appointment INNER JOIN "
+                    + "customer ON appointment.customerId=customer.customerId INNER JOIN "
+                    + "user ON appointment.userId=user.userId");
 
             while (rs.next()) {
                 //print out each appointment record
                 printAppointmentRecord(String.valueOf(rs.getInt("appointmentId")),
-                        String.valueOf(rs.getInt("customerId")), String.valueOf(rs.getInt("userId")),
-                        rs.getString("title"), rs.getString("location"), rs.getString("type"),
-                        rs.getString("start"), rs.getString("end"));
+                        String.valueOf(rs.getInt("customerId")), rs.getString("customerName"), 
+                        String.valueOf(rs.getInt("userId")),rs.getString("userName"), 
+                        rs.getString("type"), rs.getString("start"), rs.getString("end"));
             }
 
             DatabaseConnection.closeConnection();
@@ -215,19 +217,34 @@ public class Appointments {
         return false;
     }
 
-    private static void printAppointmentRecord(String appointmentId, String customerId, String userId,
-            String title, String location, String type, String start, String end) {
-        System.out.printf("%-14s| %-13s| %-13s| %-50s| %-50s| %-50s| %-25s| %-25s|\n",
-                appointmentId, customerId, userId, title, location, type, start, end);
+    private static void printAppointmentRecord(String appointmentId, String customerId, 
+            String customerName, String userId, String userName, String type, String start, String end) {
+        System.out.printf("%-14s| %-13s| %-35s| %-13s| %-35s|  %-20s| %-25s| %-25s\n",
+                appointmentId, customerId, customerName, userId, userName, type, start, end);
     }
 
     private static String getAppointmentType() {
+
         System.out.println("What type of appointment is this?");
         System.out.println("1. New Customer Appointment");
         System.out.println("2. Returning Customer Appointment");
         System.out.println("3. Customer Complaint Appointment");
+        System.out.println("4(or other). Custom Appointment Type");
         System.out.print("Choice: ");
-        return sc.nextLine();
+        
+        int choice = Integer.parseInt(sc.nextLine());
+        switch(choice) {
+            case 1:
+                return "New Customer";
+            case 2:
+                return "Returning Customer";
+                        
+            case 3:
+                return "Customer Complaint";
+            default: //covers 4 or other input
+                System.out.println("Enter appointment type: ");
+                return sc.nextLine();
+        }
     }
 
     private static ZonedDateTime getStartTimeInUTC() {
