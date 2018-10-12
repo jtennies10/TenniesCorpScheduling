@@ -25,7 +25,7 @@ public class CalendarManager {
 
     public void openCalendar(User currentUser) {
         int choice = -1;
-        CustomMonth cm = new CustomMonth(LocalDate.now());
+        CustomMonth cm = new CustomMonth(LocalDate.now(), currentUser);
         do {
             
             cm.displayView();
