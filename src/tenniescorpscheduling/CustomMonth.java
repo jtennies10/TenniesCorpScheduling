@@ -13,58 +13,73 @@ import java.time.temporal.TemporalAdjusters;
  */
 public class CustomMonth {
 
-    final private LocalDate firstOfMonth;
-    final private LocalDate lastOfMonth;
+    private LocalDate currentDate;
     private int monthlyWeekNumber = 0;
     private boolean monthlyViewActive = true;
 
+    //TODO: add code to get appointments from database that are in this month
     public CustomMonth(LocalDate currentDate) {
-        firstOfMonth = currentDate.with(TemporalAdjusters.firstDayOfMonth());
-        lastOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
-    }
-    
-    public CustomMonth(LocalDate currentDate, int monthlyWeekNumber) {
-        firstOfMonth = currentDate.with(TemporalAdjusters.firstDayOfMonth());
-        lastOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
-        this.monthlyWeekNumber = monthlyWeekNumber;              
+        this.currentDate = currentDate;
     }
 
     public boolean isMonthlyViewActive() {
         return monthlyViewActive;
     }
-    
+
     public void changeViewType() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        monthlyViewActive = !monthlyViewActive;
     }
 
     public void displayView() {
-        if(monthlyViewActive) displayMonth();
-        else displayWeek();
+        if (monthlyViewActive) {
+            displayMonth();
+        } else {
+            displayWeek();
+        }
     }
 
-    public void nextMonth() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public CustomMonth nextMonth() {
+        return new CustomMonth(currentDate.plusMonths(1));
     }
 
-    public void nextWeek() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public CustomMonth nextWeek() {
+        if (doesMonthChange(1)) {
+            return new CustomMonth(currentDate.plusWeeks(1));
+        }
+
+        currentDate = currentDate.plusWeeks(1);
+        return this;
     }
 
-    public void previousMonth() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public CustomMonth previousMonth() {
+        return new CustomMonth(currentDate.minusMonths(1));
     }
 
-    public void previousWeek() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public CustomMonth previousWeek() {
+        if (doesMonthChange(-1)) {
+            return new CustomMonth(currentDate.plusWeeks(-1));
+        }
+
+        currentDate = currentDate.plusWeeks(-1);
+        return this;
     }
-    
+
     private void displayMonth() {
+        System.out.println("Month: " + currentDate.getMonth());
         
     }
-    
+
     private void displayWeek() {
-        
+
     }
-    
-    
+
+    private boolean doesMonthChange(int additionalWeeks) {
+        if (currentDate.getMonth()
+                != currentDate.plusWeeks(additionalWeeks).getMonth()) {
+            return true;
+        }
+
+        return false;
+    }
+
 }
