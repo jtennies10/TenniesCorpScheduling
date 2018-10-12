@@ -4,6 +4,9 @@
 package tenniescorpscheduling;
 
 import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -41,8 +44,9 @@ public class TenniesCorpScheduling {
 
         User currentUser = new User(1, "jten");
         
-        CustomersManager cm = new CustomersManager();
-        AppointmentsManager am = new AppointmentsManager();
+        CustomersManager customersManager = new CustomersManager();
+        AppointmentsManager apptsManager = new AppointmentsManager();
+        CalendarManager calendarManager = new CalendarManager(LocalDate.now());
         
         
         int generalChoice = -1;
@@ -54,18 +58,19 @@ public class TenniesCorpScheduling {
             switch (generalChoice) {
                 case 1:
                 //Customer options
-                    cm.printCustomerOptions();
+                    customersManager.printCustomerOptions();
                     choice = currentUser.getUserChoice();
-                    cm.executeCustomerChoice(choice, currentUser);
+                    customersManager.executeCustomerChoice(choice, currentUser);
                     break;
                 case 2:
                 //appointment options
-                    am.printAppointmentOptions();
+                    apptsManager.printAppointmentOptions();
                     choice = currentUser.getUserChoice();
-                    am.executeAppointmentChoice(choice, currentUser);
+                    apptsManager.executeAppointmentChoice(choice, currentUser);
                     break;
                 case 3:
                 //calendar options
+                    calendarManager.openCalendar(currentUser);
                     break;
                 case 4:
                 //report options
