@@ -27,39 +27,41 @@ public class CalendarManager {
         int choice = -1;
         CustomMonth cm = new CustomMonth(LocalDate.now());
         do {
+            
+            cm.displayView();
+            
             printChoices();
             choice = currentUser.getUserChoice();
             
             switch (choice) {
                 case 1:
                     //switch calendar and display
+                    System.out.println("Switch");
                     cm.changeViewType();
-                    cm.displayView();
 
                     break;
                 case 2:
                     //next week or month
+                    System.out.println("Next");
                     if (cm.isMonthlyViewActive()) {
-                        cm.nextMonth();
-                        cm.displayView();
+                        cm = cm.nextMonth();
                     } else {
-                        cm.nextWeek();
-                        cm.displayView();
+                        cm = cm.nextWeek();
                     }
 
                     break;
                 case 3:
                     //previous week or month
+                    System.out.println("Previous");
                     if (cm.isMonthlyViewActive()) {
-                        cm.previousMonth();
-                        cm.displayView();
+                        cm = cm.previousMonth();
                     } else {
-                        cm.previousWeek();
-                        cm.displayView();
+                        cm = cm.previousWeek();
                     }
 
                     break;
                 case 4: //quit calendar, do nothing
+                    System.out.println("Quit");
                     break;
                 default:
                     System.out.println("Invalid choice");
@@ -73,34 +75,5 @@ public class CalendarManager {
         System.out.println("3. Previous");
         System.out.println("4. Quit calendar");
     }
-
-//    private void displayMonthView() {
-//        LocalDateTime currentMonthDateTime = startDateTime.minusMonths(monthOffset);
-//        
-//        LocalDateTime firstOfMonth = currentMonth.minusDays(
-//                (currentMonth.getDayOfMonth()+1));
-//        
-//        LocalDateTime lastOfMonth = firstOfMonth.plusDays(monthOffset)
-//    }
-//
-//    private void displayNextMonth() {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-//
-//    private void displayPreviousMonth() {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-//
-//    private void displayWeekView() {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-//
-//    private void displayNextWeek() {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-//
-//    private void displayPreviousWeek() {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
 
 }
