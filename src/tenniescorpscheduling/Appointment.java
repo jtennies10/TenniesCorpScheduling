@@ -3,6 +3,7 @@
  */
 package tenniescorpscheduling;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 /**
@@ -19,10 +20,12 @@ public class Appointment {
    private String contact;
    private String type;
    private String url;
-   private ZonedDateTime start; //time is stored in utc
-   private int lengthInMinutes;
+   private LocalDateTime start; //time is stored in utc
+   private LocalDateTime end;
 
-    public Appointment(int appointmentId, int customerId, int userId, String title, String description, String location, String contact, String type, String url, ZonedDateTime start, int lengthInMinutes) {
+    public Appointment(int appointmentId, int customerId, int userId, String title, 
+            String description, String location, String contact, String type, String url, 
+            LocalDateTime start, LocalDateTime end) {
         this.appointmentId = appointmentId;
         this.customerId = customerId;
         this.userId = userId;
@@ -33,7 +36,7 @@ public class Appointment {
         this.type = type;
         this.url = url;
         this.start = start;
-        this.lengthInMinutes = lengthInMinutes;
+        this.end = end;
     }
 
     public int getAppointmentId() {
@@ -104,21 +107,23 @@ public class Appointment {
         this.url = url;
     }
 
-    public ZonedDateTime getStart() {
+    public LocalDateTime getStart() {
         return start;
     }
 
-    public void setStart(ZonedDateTime start) {
+    public void setStart(LocalDateTime start) {
         this.start = start;
     }
 
-    public int getLengthInMinutes() {
-        return lengthInMinutes;
+    public LocalDateTime getEnd() {
+        return end;
     }
 
-    public void setLengthInMinutes(int lengthInMinutes) {
-        this.lengthInMinutes = lengthInMinutes;
+    public void setEnd(LocalDateTime end) {
+        this.end = end;
     }
+
+   
     
     
    
