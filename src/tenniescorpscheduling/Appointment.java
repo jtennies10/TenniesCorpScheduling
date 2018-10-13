@@ -121,16 +121,11 @@ public class Appointment {
 
     public void setEnd(LocalDateTime end) {
         this.end = end;
+    } 
+    
+    @Override 
+    public String toString() {
+        return String.valueOf(appointmentId);
     }
-
-   
-    
-    
-   
-    
-   
-
-   
-   
    
 }

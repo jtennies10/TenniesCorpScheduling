@@ -100,25 +100,28 @@ public class CustomMonth {
 
             //create temporary Day[] with size of month
             month = new Day[lastOfMonth.getDayOfMonth()];
-
-            //get all the appointments that fall within the month
-            ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM appointment "
-                    + "WHERE (start BETWEEN '%s' AND '%s') AND userId=%d", firstOfMonth.toString(),
-                    lastOfMonth.toString(), currentUser.getUserId()));
+            
 
             //create the Day objects and add them into month
             Period p = Period.ofDays(1);
-            while(firstOfMonth.getDayOfMonth() != lastOfMonth.getDayOfMonth()) {
-                month[firstOfMonth.getDayOfMonth()-1] 
-                        = new Day(firstOfMonth.getDayOfMonth(), firstOfMonth.getDayOfWeek());
-                firstOfMonth = firstOfMonth.plus(p);
+            LocalDate monthIterator = LocalDate.from(firstOfMonth);
+            while(monthIterator.getDayOfMonth() != lastOfMonth.getDayOfMonth()) {
+                month[monthIterator.getDayOfMonth()-1] 
+                        = new Day(monthIterator.getDayOfMonth(), monthIterator.getDayOfWeek());
+                monthIterator = monthIterator.plus(p);
             }
             
             //create Day object for last day of the month
             month[month.length-1] = new Day(lastOfMonth.getDayOfMonth(), lastOfMonth.getDayOfWeek());
             
+            
+            //get all the appointments that fall within the month
+            ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM appointment "
+                    + "WHERE (start BETWEEN '%s' AND '%s') AND userId=%d", firstOfMonth.toString(),
+                    lastOfMonth.toString(), currentUser.getUserId()));
+            
             //add their appointments to their appropriate days
-            while(rs.next()) {
+            while(rs.next()) {           
                 //create an Appointment object from the current record
                 Appointment appt = new Appointment(rs.getInt("appointmentId"), rs.getInt("customerId"), 
                         rs.getInt("userId"), rs.getString("title"), rs.getString("description"), 
@@ -127,9 +130,14 @@ public class CustomMonth {
                         rs.getTimestamp("end").toLocalDateTime());
                 
                 //add appt to the corresponding day in month
-                int currentDay = rs.getTimestamp("start").toLocalDateTime().getDayOfMonth() - 1;
-                month[currentDay].addAppointment(appt);   
+                int currentDayIndex = rs.getTimestamp("start").toLocalDateTime().getDayOfMonth() - 1;
+                month[currentDayIndex].addAppointment(appt); 
+                           
             }
+            
+//            for(Day d : month) {
+//                System.out.println(d.getDayOfMonth() + d.getAppointments().toString());
+//            }
             
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Error communicatng with the database. Appointments "
@@ -145,17 +153,29 @@ public class CustomMonth {
 
         //obtain the first and last days of the month
         //the first is called upTo as it will iterate through the month
-        LocalDate upTo = currentDate.with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate lastOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
-        Period p = Period.ofDays(1);
+//        LocalDate upTo = currentDate.with(TemporalAdjusters.firstDayOfMonth());
+//        LocalDate lastOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+//        Period p = Period.ofDays(1);
+//
+//        while (upTo.getDayOfMonth() != lastOfMonth.getDayOfMonth()) {
+//            printDay(upTo);
+//            upTo = upTo.plus(p);
+//        }
+//
+//        //the last day of the month still needs printed out
+//        printDayOfMonth(lastOfMonth);
 
-        while (upTo.getDayOfMonth() != lastOfMonth.getDayOfMonth()) {
-            printDay(upTo);
-            upTo = upTo.plus(p);
-        }
-
-        //the last day of the month still needs printed out
-        printDay(lastOfMonth);
+          //get the last day of the month and iterate through the month,
+          //printing each day
+//          int lastOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+//          
+//          for(int i = 0; i < lastOfMonth; i++) {
+//              printDayOfMonth(i);
+//          }
+          
+          for(Day d : daysInCurrentMonth) {
+              System.out.println(d);
+          }
 
     }
 
@@ -179,7 +199,7 @@ public class CustomMonth {
 
         //print out each day of the week
         for (int i = 0; i < 7; i++) {
-            printDay(startOfWeek.plusDays(i));
+            printDayOfWeek(startOfWeek.plusDays(i));
         }
     }
 
@@ -194,21 +214,35 @@ public class CustomMonth {
 
     private void printHeader() {
         System.out.println("Month: " + currentDate.getMonth());
-        System.out.printf("%-20s|%-20s|%-20s|%-20s|%-20s|%-20s|%-20s|%-20s\n",
+        System.out.printf("%-15s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s\n",
                 "", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00",
                 "15:00", "16:00");
 
         //print a separator
-        for (int i = 0; i < 160; i++) {
+        for (int i = 0; i < 224; i++) {
             System.out.print("-");
         }
         System.out.println("");
     }
 
+    
+//    private void printDayOfMonth(int index) {
+//        System.out.println(daysInCurrentMonth[index]);
+//    }
+    
     //TODO:convert so that printDay prints the actual Date object
-    private void printDay(LocalDate date) {
-        System.out.println(String.valueOf(date.getDayOfMonth()) + " "
-                + date.getDayOfWeek());
+    private void printDayOfWeek(LocalDate date) {
+//        System.out.println(String.valueOf(date.getDayOfMonth()) + " "
+//                + date.getDayOfWeek());
+
+        if(date.getMonth() == currentDate.getMonth()) {
+            System.out.println(daysInCurrentMonth[date.getDayOfMonth() - 1]);
+        } else if(date.getMonthValue() > currentDate.getMonthValue()) {
+            System.out.println(daysInNextMonth[date.getDayOfMonth() - 1]);
+        } else {
+            System.out.println(daysInPreviousMonth[date.getDayOfMonth() -1]);
+        }
     }
+
 
 }
