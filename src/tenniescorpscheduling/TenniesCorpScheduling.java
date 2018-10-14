@@ -26,23 +26,23 @@ public class TenniesCorpScheduling {
         //Locale locale = new Locale("es");
 
         ResourceBundle rb = ResourceBundle.getBundle("res.Login", locale);
-//
-//        System.out.println(rb.getString("welcome"));
-//        System.out.println(rb.getString("login"));
-//
-//        User currentUser = null;
-//        do {
-//            currentUser = Login.attemptLogIn(rb);
-//
-//            if (currentUser == null) {
-//                System.out.println(rb.getString("invalid"));
-//            }
-//
-//        } while (currentUser == null);
-//
-//        System.out.println(rb.getString("success"));
 
-        User currentUser = new User(1, "jten");
+        System.out.println(rb.getString("welcome"));
+        System.out.println(rb.getString("login"));
+
+        User currentUser = null;
+        do {
+            currentUser = LoginManager.attemptLogIn(rb);
+
+            if (!currentUser.isLoginSuccessful()) {
+                System.out.println(rb.getString("invalid"));
+            }
+
+        } while (!currentUser.isLoginSuccessful());
+
+        System.out.println(rb.getString("success"));
+
+        //User currentUser = new User(1, "jten");
         
         CustomersManager customersManager = new CustomersManager();
         AppointmentsManager apptsManager = new AppointmentsManager();

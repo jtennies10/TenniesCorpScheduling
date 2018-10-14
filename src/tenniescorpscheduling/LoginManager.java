@@ -4,6 +4,7 @@
  */
 package tenniescorpscheduling;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,14 +26,8 @@ public class LoginManager {
         String userName = getLogInUserName(rb);
         String password = getLogInPassword(rb);
         
-        try {
-            DatabaseConnection.makeConnection();
-        } catch(ClassNotFoundException | SQLException e) {
-            System.out.println(rb.getString("error"));
-            return null;
-        }
-        
-        try(Statement stmt = DatabaseConnection.getConn().createStatement()) {
+        try(Connection conn = DatabaseConnection.makeConnection();
+                Statement stmt = DatabaseConnection.getConn().createStatement()) {
             
             ResultSet rs = stmt.executeQuery(String.format("select * from user where userName='%s' AND password='%s'", 
                 userName, password));
@@ -44,7 +39,7 @@ public class LoginManager {
                     String username = rs.getString("userName");
                     
                     DatabaseConnection.closeConnection();
-                    return new User(userid, username); 
+                    return new User(userid, username, true); 
                 }
             }   
 
@@ -54,7 +49,7 @@ public class LoginManager {
             System.out.println(rb.getString("error"));
         } 
         
-        return null;
+        return new User(-1, userName, false);
     }
     
     
