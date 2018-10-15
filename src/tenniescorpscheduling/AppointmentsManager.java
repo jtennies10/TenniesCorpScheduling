@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -322,7 +323,11 @@ public class AppointmentsManager {
                 ZonedDateTime.now().getOffset().getTotalSeconds());
         
         if(start.getHour() < 8 || start.getHour() > 17 
-                || end.getHour() < 8 || end.getHour() > 17) {
+                || end.getHour() < 8 || end.getHour() > 17 || 
+                start.getDayOfWeek() == DayOfWeek.SATURDAY || 
+                start.getDayOfWeek() == DayOfWeek.SUNDAY || 
+                end.getDayOfWeek() == DayOfWeek.SATURDAY || 
+                end.getDayOfWeek() == DayOfWeek.SUNDAY) {
             throw new InvalidAppointmentException("Appointment times "
                     + "outside business hours");
         }
