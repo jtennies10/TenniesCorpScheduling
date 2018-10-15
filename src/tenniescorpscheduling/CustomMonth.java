@@ -4,14 +4,12 @@
  */
 package tenniescorpscheduling;
 
-import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.temporal.TemporalAdjusters;
 
@@ -32,7 +30,6 @@ public class CustomMonth {
     public CustomMonth(LocalDate currentDate, User currentUser) {
         this(currentDate, currentUser, true);
     }
-    //TODO: add code to get appointments from database that are in this month
 
     private CustomMonth(LocalDate currentDate, User currentUser, boolean monthlyViewActive) {
         this.currentDate = currentDate;
