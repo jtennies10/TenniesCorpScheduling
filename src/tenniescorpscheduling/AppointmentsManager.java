@@ -34,6 +34,7 @@ public class AppointmentsManager {
         System.out.println("2. Add appointment");
         System.out.println("3. Update appointment");
         System.out.println("4. Delete appointment");
+        System.out.println("5. Return to general options");
     }
 
     public void executeAppointmentChoice(int userChoice, User currentUser) {
@@ -69,8 +70,8 @@ public class AppointmentsManager {
                         System.out.println("Appointment delete failed");
                     }
                     break;
-                default:
-                    System.out.println("Invalid choice, returning to general options");
+                default: //case 5 and default
+                    System.out.println("Returning to general options");
             }
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Error communicating with the database.");
