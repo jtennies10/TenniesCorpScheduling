@@ -64,8 +64,14 @@ public class CustomersManager {
                 default:
                     System.out.println("Invalid choice, returning to general options");
             }
-        } catch (ClassNotFoundException | SQLException e) {
+        }  
+        
+        catch (ClassNotFoundException | SQLException e) {
             System.out.println("Error communicating with the database.");
+            System.out.println(e.getMessage());
+        }
+        catch (IllegalArgumentException e) {
+            System.out.println("Invalid customer data entered.");
             System.out.println(e.getMessage());
         }
     }
@@ -114,6 +120,7 @@ public class CustomersManager {
         //acquire updated customer table fields for all tables
         System.out.print("Enter customer name: ");
         String newName = sc.nextLine();
+        validate(newName);
 
         System.out.print("Enter customer addressId: ");
         int newAddressId = Integer.parseInt(sc.nextLine());
@@ -129,15 +136,17 @@ public class CustomersManager {
 
             System.out.print("Enter address: ");
             String newAddress = sc.nextLine();
+            validate(newAddress);
 
             System.out.print("Enter cityId: ");
             int newCityId = Integer.parseInt(sc.nextLine());
 
             System.out.print("Enter postal code: ");
             String newPostalCode = sc.nextLine();
-
+            
             System.out.print("Enter phone: ");
             String newPhone = sc.nextLine();
+            validate(newPhone);
 
             //check if the cityId already exists for a city record,
             //if so return true
@@ -150,6 +159,7 @@ public class CustomersManager {
 
                 System.out.print("Enter city: ");
                 String newCity = sc.nextLine();
+                validate(newCity);
 
                 System.out.print("Enter countryId: ");
                 int newCountryId = Integer.parseInt(sc.nextLine());
@@ -165,6 +175,7 @@ public class CustomersManager {
 
                     System.out.print("Enter country: ");
                     String newCountry = sc.nextLine();
+                    validate(newCountry);
 
                     addCountry(stmt, newCountryId, newCountry, currentUser);
 
@@ -185,11 +196,7 @@ public class CustomersManager {
                 + " SET customerName='%s', addressId=%d, lastUpdate=NOW(), lastUpdateBy='%s'"
                 + " WHERE customerid=%d", newName, newAddressId, currentUser.getUserName(), customerid));
 
-        if (result != 1) {
-            return false;
-        }
-
-        return true;
+        return result == 1;
     }
 
     public boolean addCustomer(Statement stmt, User currentUser)
@@ -198,6 +205,7 @@ public class CustomersManager {
         //get customer info
         System.out.print("Enter customer name: ");
         String customerName = sc.nextLine();
+        validate(customerName);
 
         System.out.print("Enter customer address id: ");
         int customerAddressId = Integer.parseInt(sc.nextLine());
@@ -212,6 +220,7 @@ public class CustomersManager {
 
             System.out.print("Enter address: ");
             String address = sc.nextLine();
+            validate(address);
 
             System.out.print("Enter cityId: ");
             int cityId = Integer.parseInt(sc.nextLine());
@@ -221,6 +230,7 @@ public class CustomersManager {
 
             System.out.print("Enter phone: ");
             String phone = sc.nextLine();
+            validate(phone);
 
             //check if the cityId already exists for a city record
             rs = stmt.executeQuery(String.format("SELECT * FROM city WHERE "
@@ -232,6 +242,7 @@ public class CustomersManager {
 
                 System.out.print("Enter city: ");
                 String city = sc.nextLine();
+                validate(city);
 
                 System.out.print("Enter countryId: ");
                 int countryId = Integer.parseInt(sc.nextLine());
@@ -246,6 +257,7 @@ public class CustomersManager {
 
                     System.out.print("Enter country: ");
                     String country = sc.nextLine();
+                    validate(country);
 
                     addCountry(stmt, countryId, country, currentUser);
 
@@ -302,6 +314,12 @@ public class CustomersManager {
             String addressId, String address, String cityId, String city, String countryId, String country) {
         System.out.printf("%-12s| %-45s| %-12s| %-50s| %-12s| %-50s| %-12s| %-50s|\n",
                 customerid, customerName, addressId, address, cityId, city, countryId, country);
+    }
+    
+    private void validate(String str) throws IllegalArgumentException {
+        if(str.isEmpty()) {
+            throw new IllegalArgumentException("Empty string entered for mandatory field");
+        }
     }
 
     private void addAddress(Statement stmt, int addressId, String address, int cityId, String postalCode,

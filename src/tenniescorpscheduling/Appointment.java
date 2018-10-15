@@ -20,8 +20,8 @@ public class Appointment {
    private String contact;
    private String type;
    private String url;
-   private LocalDateTime start; //time is stored in utc
-   private LocalDateTime end;
+   private LocalDateTime start;
+   private LocalDateTime end; 
 
     public Appointment(int appointmentId, int customerId, int userId, String title, 
             String description, String location, String contact, String type, String url, 
