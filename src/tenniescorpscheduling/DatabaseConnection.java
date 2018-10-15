@@ -21,13 +21,11 @@ public class DatabaseConnection {
     public static Connection makeConnection() throws ClassNotFoundException, SQLException {
         Class.forName(driver);
         conn = DriverManager.getConnection(dbURL, username, password);
-        System.out.println("Connection successful!");
         return conn;
     }
     
     public static void closeConnection() throws ClassNotFoundException, SQLException {
         conn.close();
-        System.out.println("Connection closed!");
     }
     
     public static Connection getConn() {

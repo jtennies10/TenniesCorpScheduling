@@ -48,7 +48,7 @@ public class Main {
         CustomersManager customersManager = new CustomersManager();
         AppointmentsManager apptsManager = new AppointmentsManager();
         CalendarManager calendarManager = new CalendarManager(LocalDate.now());
-        
+        ReportManager reportManager = new ReportManager();
         
         int generalChoice = -1;
         do {
@@ -75,6 +75,9 @@ public class Main {
                     break;
                 case 4:
                 //report options
+                    reportManager.printCustomerOptions();
+                    choice = currentUser.getUserChoice();
+                    reportManager.executeReportChoice(choice);
                     break;
                 case 5:
                 //exit program
