@@ -125,7 +125,8 @@ public class Appointment {
     
     @Override 
     public String toString() {
-        return String.valueOf(appointmentId);
+        return "ID: " + appointmentId + " Customer ID: " + customerId
+                + " at " + start.toString();
     }
    
 }

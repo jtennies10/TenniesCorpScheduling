@@ -41,6 +41,7 @@ public class Main {
         } while (!currentUser.isLoginSuccessful());
 
         System.out.println(rb.getString("success"));
+        LoginManager.checkUpcomingAppointment(currentUser);
 
         //User currentUser = new User(1, "jten");
         

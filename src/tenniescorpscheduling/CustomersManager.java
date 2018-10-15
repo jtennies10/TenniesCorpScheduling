@@ -82,7 +82,7 @@ public class CustomersManager {
         ResultSet rs = stmt.executeQuery("SELECT * FROM customer INNER JOIN address "
                 + "ON customer.addressId = address.addressId INNER JOIN city ON "
                 + "address.cityId = city.cityId INNER JOIN country ON "
-                + "city.countryId = country.countryId");
+                + "city.countryId = country.countryId ORDER BY customerId");
 
         printCustomerRecord("Customer ID", "Customer Name", "Address ID",
                 "Address", "City ID", "City", "Country ID", "Country");

@@ -94,7 +94,7 @@ public class AppointmentsManager {
 
         ResultSet rs = stmt.executeQuery("SELECT * FROM appointment INNER JOIN "
                 + "customer ON appointment.customerId=customer.customerId INNER JOIN "
-                + "user ON appointment.userId=user.userId");
+                + "user ON appointment.userId=user.userId ORDER BY appointmentId");
 
         while (rs.next()) {
             //convert stored UTC times to the users time zone
@@ -223,7 +223,7 @@ public class AppointmentsManager {
     private static ZonedDateTime getStartTimeInUTC() {
         //first get the local date and time
         System.out.print("Enter appointment start time in the following format"
-                + "Note - Start time must be at 00, 15, 30, or 45 minutes"
+                + "\nNote - Start time must be at 00, 15, 30, or 45 minutes"
                 + "\n(YYYY MM DD HH mm): ");
         ZonedDateTime local = ZonedDateTime.of(sc.nextInt(), sc.nextInt(),
                 sc.nextInt(), sc.nextInt(), sc.nextInt(), 0, 0, ZoneId.systemDefault());
@@ -315,9 +315,9 @@ public class AppointmentsManager {
     private static void validate(Statement stmt, Appointment appt) 
             throws InvalidAppointmentException, SQLException {
         //check if appointment is outside business hours
-        LocalDateTime start = appt.getStart().minusSeconds(
+        LocalDateTime start = appt.getStart().plusSeconds(
                 ZonedDateTime.now().getOffset().getTotalSeconds());
-        LocalDateTime end = appt.getEnd().minusSeconds(
+        LocalDateTime end = appt.getEnd().plusSeconds(
                 ZonedDateTime.now().getOffset().getTotalSeconds());
         
         if(start.getHour() < 8 || start.getHour() > 17 

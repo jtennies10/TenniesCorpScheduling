@@ -8,6 +8,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
@@ -50,6 +54,28 @@ public class LoginManager {
         } 
         
         return new User(-1, userName, false);
+    }
+    
+    public static void checkUpcomingAppointment(User currentUser) {
+        try(Connection conn = DatabaseConnection.makeConnection();
+                Statement stmt = DatabaseConnection.getConn().createStatement()) {
+            
+            LocalDateTime now = LocalDateTime.now().minusSeconds(
+                    ZonedDateTime.now().getOffset().getTotalSeconds());
+            
+            ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM "
+                    + "appointment WHERE (userId=%d) AND (start BETWEEN '%s' AND '%s')", 
+                    currentUser.getUserId(), now, now.plusMinutes(15)));
+            
+            if(rs.first()) {
+                System.out.println("Appointment upcoming in the next 15 minutes");
+                System.out.println("Appointment ID: " + rs.getString("appointmentId")
+                    + " Start: " + rs.getTimestamp("start"));
+            }
+            
+        } catch(ClassNotFoundException | SQLException e) {
+            System.out.println("Error communicating with the database");
+        } 
     }
     
     
