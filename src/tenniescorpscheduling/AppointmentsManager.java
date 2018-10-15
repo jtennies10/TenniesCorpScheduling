@@ -75,8 +75,11 @@ public class AppointmentsManager {
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Error communicating with the database.");
             System.out.println(e.getMessage());
-
+        } catch (InvalidAppointmentException e) {
+            System.out.println("Appoiment details are not valid.");
+            System.out.println(e.getMessage());
         }
+        
     }
 
     public void viewAllAppointments(Statement stmt) throws SQLException {
@@ -97,7 +100,7 @@ public class AppointmentsManager {
             //convert stored UTC times to the users time zone
             Timestamp storedStartTimeStamp = rs.getTimestamp("start");
             LocalDateTime localStartDateTime = storedStartTimeStamp.toLocalDateTime();
-            
+
             Timestamp storedEndTimeStamp = rs.getTimestamp("end");
             LocalDateTime localEndDateTime = storedEndTimeStamp.toLocalDateTime();
 
@@ -112,56 +115,19 @@ public class AppointmentsManager {
 
     public boolean addAppointment(Statement stmt, User currentUser) throws SQLException {
 
-        System.out.print("Enter ID of customer the appointment is for: ");
-        int customerId = Integer.parseInt(sc.nextLine());
-
-        ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM customer WHERE customerId=%d",
-                customerId));
-
-        if (!rs.next()) {
-            System.out.println("The customer ID does not exist. "
-                    + "Please create the customer in the customer options first");
+        Appointment appt = getAppointmentInformation(stmt, currentUser);
+        if (appt == null) {
             return false;
         }
-
-        System.out.print("Enter appointment title: ");
-        String title = sc.nextLine();
-
-        System.out.print("Enter appointment description: ");
-        String description = sc.nextLine();
-
-        System.out.print("Enter appointment location: ");
-        String location = sc.nextLine();
-
-        //get customer number to store as the contact field
-        rs = stmt.executeQuery(String.format("SELECT phone FROM address WHERE addressId="
-                + "(SELECT addressId FROM customer WHERE customerId=%d)", customerId));
-
-        //move to first record and get the phone field
-        rs.first();
-        String contact = rs.getString("phone");
-
-        String type = getAppointmentType();
-
-        //get the start time in UTC and then break it down into 
-        //localdate and localtime
-        ZonedDateTime start = getStartTimeInUTC();
-        LocalTime startTimeInUTC = start.toLocalTime();
-        LocalDate dateInUTC = start.toLocalDate();
-
-        //get appointment length and add it to startTimeInUTC
-        //to get endTimeInUTC
-        System.out.print("Enter length of appointment in minutes: ");
-        int lengthInMinutes = Integer.parseInt(sc.nextLine());
-        LocalTime endTimeInUTC = startTimeInUTC.plusMinutes(lengthInMinutes);
+        validate(stmt, appt);
 
         int result = stmt.executeUpdate(String.format("INSERT INTO "
                 + "appointment(customerId, userId, title, description, location, "
                 + "contact, type, start, end, createDate, createdBy, lastUpdateBy) "
                 + "VALUES(%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW(),"
-                + "'%s', '%s')", customerId, currentUser.getUserId(), title, description,
-                location, contact, type, (dateInUTC + " " + startTimeInUTC),
-                (dateInUTC + " " + endTimeInUTC), currentUser.getUserName(),
+                + "'%s', '%s')", appt.getCustomerId(), currentUser.getUserId(), appt.getTitle(), appt.getDescription(),
+                appt.getLocation(), appt.getContact(), appt.getType(), appt.getStart().toString(),
+                appt.getEnd().toString(), currentUser.getUserName(),
                 currentUser.getUserName()));
 
         if (result != 1) {
@@ -180,37 +146,22 @@ public class AppointmentsManager {
             System.out.println("No appointment exists with that ID.");
             return false;
         }
-
-        System.out.print("Enter new appointment title: ");
-        String newTitle = sc.nextLine();
-
-        System.out.print("Enter new appointment description: ");
-        String newDescription = sc.nextLine();
-
-        System.out.print("Enter new appointment location: ");
-        String newLocation = sc.nextLine();
-
-        String newType = getAppointmentType();
-
-        //get the start time in UTC and then break it down into 
-        //localdate and localtime
-        ZonedDateTime newStart = getStartTimeInUTC();
-        LocalTime newStartTimeInUTC = newStart.toLocalTime();
-        LocalDate newDateInUTC = newStart.toLocalDate();
-
-        //get appointment length and add it to startTimeInUTC
-        //to get endTimeInUTC
-        System.out.print("Enter length of appointment in minutes: ");
-        int newLengthInMinutes = Integer.parseInt(sc.nextLine());
-        LocalTime newEndTimeInUTC = newStartTimeInUTC.plusMinutes(newLengthInMinutes);
+        
+        ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM appointment "
+                + "WHERE appoinmentId=%d", appointmentId));
+        
+        rs.first();
+        int userId = rs.getInt("userId");
+        
+        Appointment appt = getAppointmentInformation(stmt, userId, currentUser);
+        validate(stmt, appt);
 
         int result = stmt.executeUpdate(String.format(
                 "UPDATE appointment SET title='%s', description='%s', location='%s', "
                 + "type='%s', start='%s', end='%s', lastUpdate=NOW(), lastUpdateBy='%s' "
                 + "WHERE appointmentId='%s'",
-                newTitle, newDescription, newLocation, newType,
-                (newDateInUTC + " " + newStartTimeInUTC), (newDateInUTC + " " + newEndTimeInUTC),
-                currentUser.getUserName(), appointmentId));
+                appt.getTitle(), appt.getDescription(), appt.getLocation(), appt.getType(),
+                appt.getStart(), appt.getEnd(), currentUser.getUserName(), appointmentId));
 
         if (result != 1) {
             return false;
@@ -272,6 +223,7 @@ public class AppointmentsManager {
     private static ZonedDateTime getStartTimeInUTC() {
         //first get the local date and time
         System.out.print("Enter appointment start time in the following format"
+                + "Note - Start time must be at 00, 15, 30, or 45 minutes"
                 + "\n(YYYY MM DD HH mm): ");
         ZonedDateTime local = ZonedDateTime.of(sc.nextInt(), sc.nextInt(),
                 sc.nextInt(), sc.nextInt(), sc.nextInt(), 0, 0, ZoneId.systemDefault());
@@ -297,6 +249,100 @@ public class AppointmentsManager {
         }
 
         return apptFound;
+    }
 
+    private static Appointment getAppointmentInformation(Statement stmt, User currentUser) throws SQLException {
+        return getAppointmentInformation(stmt, -1, currentUser);
+    }
+
+    private static Appointment getAppointmentInformation(Statement stmt,
+            int customerId, User currentUser) throws SQLException {
+
+        ResultSet rs;
+
+        if (customerId == -1) {
+            System.out.print("Enter ID of customer the appointment is for: ");
+            customerId = Integer.parseInt(sc.nextLine());
+
+            rs = stmt.executeQuery(String.format("SELECT * FROM customer WHERE customerId=%d",
+                    customerId));
+
+            if (!rs.next()) {
+                System.out.println("The customer ID does not exist. "
+                        + "Please create the customer in the customer options first");
+                return null;
+            }
+        }
+
+        System.out.print("Enter appointment title: ");
+        String title = sc.nextLine();
+
+        System.out.print("Enter appointment description: ");
+        String description = sc.nextLine();
+
+        System.out.print("Enter appointment location: ");
+        String location = sc.nextLine();
+
+        //get customer number to store as the contact field
+        rs = stmt.executeQuery(String.format("SELECT phone FROM address WHERE addressId="
+                + "(SELECT addressId FROM customer WHERE customerId=%d)", customerId));
+
+        //move to first record and get the phone field
+        rs.first();
+        String contact = rs.getString("phone");
+
+        rs.close();
+
+        String type = getAppointmentType();
+
+        //get the start time in UTC and then break it down into 
+        //localdate and localtime
+        ZonedDateTime start = getStartTimeInUTC();
+        LocalDateTime localStartTimeInUTC = start.toLocalDateTime();
+
+        //get appointment length and add it to startTimeInUTC
+        //to get endTimeInUTC
+        System.out.print("Enter length of appointment in minutes(15, 30, 45, or 60): ");
+        int lengthInMinutes = Integer.parseInt(sc.nextLine());
+        LocalDateTime localEndTimeInUTC = localStartTimeInUTC.plusMinutes(lengthInMinutes);
+
+        //the appointmentId is set to zero to denote it is not currently known
+        //by the program
+        return new Appointment(0, customerId, currentUser.getUserId(), title, description,
+                location, contact, type, "", localStartTimeInUTC, localEndTimeInUTC);
+    }
+
+    private static void validate(Statement stmt, Appointment appt) 
+            throws InvalidAppointmentException, SQLException {
+        //check if appointment is outside business hours
+        LocalDateTime start = appt.getStart().minusSeconds(
+                ZonedDateTime.now().getOffset().getTotalSeconds());
+        LocalDateTime end = appt.getEnd().minusSeconds(
+                ZonedDateTime.now().getOffset().getTotalSeconds());
+        
+        if(start.getHour() < 8 || start.getHour() > 17 
+                || end.getHour() < 8 || end.getHour() > 17) {
+            throw new InvalidAppointmentException("Appointment times "
+                    + "outside business hours");
+        }
+        
+        if(start.getMinute() % 15 != 0 || end.getMinute() % 15 != 0) {
+            throw new InvalidAppointmentException("Start or end time "
+                    + "is not a increment of 15 minutes");
+        }
+        
+        ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM appointment WHERE "
+                + "((start BETWEEN '%s' AND '%s') OR (end BETWEEN '%s' AND '%s')) "
+                + "AND (userId=%d)",
+                start.toString(), end.toString(), start.toString(), end.toString(),
+                appt.getUserId()));
+        
+        if(rs.first()) {
+            throw new InvalidAppointmentException("Appointment overlaps existing "
+                    + "appointment for the given user");
+        }
+        
+        rs.close();
+        
     }
 }
