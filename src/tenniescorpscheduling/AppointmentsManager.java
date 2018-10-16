@@ -373,20 +373,26 @@ public class AppointmentsManager {
                     + "outside business hours");
         }
         
+        //check if appointment doesn't start and end at increments
+        //of 15
         if(start.getMinute() % 15 != 0 || end.getMinute() % 15 != 0) {
             throw new InvalidAppointmentException("Start or end time "
                     + "is not a increment of 15 minutes");
         }
-        
+     System.out.println(start.toString() + "      " + end.toString());
+     
+
+        //check if appointment overlaps existing appointment
         ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM appointment WHERE "
                 + "((start BETWEEN '%s' AND '%s') OR (end BETWEEN '%s' AND '%s')) "
                 + "AND (userId=%d)",
-                start.toString(), end.toString(), start.toString(), end.toString(),
+                appt.getStart().toString(), appt.getEnd().toString(), 
+                appt.getStart().toString(), appt.getEnd().toString(),
                 appt.getUserId()));
         
         if(rs.first()) {
             throw new InvalidAppointmentException("Appointment overlaps existing "
-                    + "appointment for the given user");
+                    + "appointment for the current user");
         }
         
         rs.close();

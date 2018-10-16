@@ -3,7 +3,6 @@
  */
 package tenniescorpscheduling;
 
-import java.time.LocalDate;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -45,12 +44,12 @@ public class Main {
         CalendarManager calendarManager = new CalendarManager();
         ReportManager reportManager = new ReportManager();
         
-        int generalChoice = -1;
+        int generalChoice;
         do {
             
             printGeneralOptions();
             generalChoice = currentUser.getUserChoice();
-            int choice = -1; //for specific user choice
+            int choice; //for specific user choice
             switch (generalChoice) {
                 case 1:
                 //Customer options
@@ -79,6 +78,7 @@ public class Main {
                     break;
                 default:
                 //invalid value entered
+                    System.out.println("Invalid choice");
             }
         } while (generalChoice != 5);
 

@@ -29,13 +29,11 @@ public class CalendarManager {
             switch (choice) {
                 case 1:
                     //switch calendar display type
-                    System.out.println("Switch");
                     cm.changeViewType();
 
                     break;
                 case 2:
                     //next week or month
-                    System.out.println("Next");
                     if (cm.isMonthlyViewActive()) {
                         cm = cm.nextMonth();
                     } else {
@@ -45,7 +43,6 @@ public class CalendarManager {
                     break;
                 case 3:
                     //previous week or month
-                    System.out.println("Previous");
                     if (cm.isMonthlyViewActive()) {
                         cm = cm.previousMonth();
                     } else {

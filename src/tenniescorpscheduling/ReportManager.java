@@ -137,9 +137,16 @@ class ReportManager {
                     + "WHERE (start BETWEEN '%s' AND '%s') AND userId=%d", LocalDate.now().toString(),
                     LocalDate.now().plusMonths(1).toString(), u.getUserId()));
 
+            //if empty resultset, print message saying no appointments this month
+            if(!rs.first()) {
+                System.out.println("\tNo appointments this month.");
+            } else {
+                rs.previous();
+            }
             while (rs.next()) {
                 System.out.println("\tID: " + rs.getInt("appointmentId") + " Customer ID: "
                         + rs.getInt("customerId") + " at " + rs.getTimestamp("start"));
+               
             }
             rs.close();
         }
