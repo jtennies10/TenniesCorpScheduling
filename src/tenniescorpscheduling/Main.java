@@ -1,5 +1,8 @@
 /*
  * Contains the program main method and controls the program.
+ *
+ * Student Name: Joshua Tennies
+ * Student ID:#000885921
  */
 package tenniescorpscheduling;
 
