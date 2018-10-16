@@ -33,6 +33,7 @@ public class Main {
         User currentUser = null;
         do {
             currentUser = LoginManager.attemptLogIn(rb);
+            currentUser.printLogInAttemptToFile();
 
             if (!currentUser.isLoginSuccessful()) {
                 System.out.println(rb.getString("invalid"));
@@ -43,7 +44,6 @@ public class Main {
         System.out.println(rb.getString("success"));
         LoginManager.checkUpcomingAppointment(currentUser);
 
-        //User currentUser = new User(1, "jten");
         
         CustomersManager customersManager = new CustomersManager();
         AppointmentsManager apptsManager = new AppointmentsManager();
