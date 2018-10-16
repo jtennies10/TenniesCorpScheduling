@@ -9,14 +9,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
-/**
- *
- * @author Joshua
- */
-public class CustomersManager {
+public class CustomersManager implements Predicate {
 
-    static Scanner sc = new Scanner(System.in);
+    Scanner sc = new Scanner(System.in);
 
     public CustomersManager() {
     }
@@ -30,9 +27,13 @@ public class CustomersManager {
         System.out.println("5. Return to general options");
     }
 
+    /*
+    Serves as the controller for all of the customer options,
+    catching exceptions and performing the user choices
+     */
     public void executeCustomerChoice(int userChoice, User currentUser) {
         try (Connection conn = DatabaseConnection.makeConnection();
-                Statement stmt = DatabaseConnection.conn.createStatement()) {
+                Statement stmt = DatabaseConnection.getConn().createStatement()) {
             switch (userChoice) {
                 case 1:
                     //view customers
@@ -65,19 +66,21 @@ public class CustomersManager {
                 default: //case 5 and default
                     System.out.println("Returning to general options");
             }
-        }  
-        
-        catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             System.out.println("Error communicating with the database.");
             System.out.println(e.getMessage());
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
+            //handles invalid customer information entered by the user
             System.out.println("Invalid customer data entered.");
             System.out.println(e.getMessage());
         }
     }
-    //TODO: Update to new ERD
 
+    /*
+    Retrieves all customers in the database, along with their corresponding
+    basic address, city, and country information, displaying each with a general
+    overview
+     */
     public void viewCustomers(Statement stmt) throws SQLException {
 
         ResultSet rs = stmt.executeQuery("SELECT * FROM customer INNER JOIN address "
@@ -104,6 +107,31 @@ public class CustomersManager {
 
     }
 
+    /*
+    Uses the getCustomerInformation method to get a Customer object,
+    then adds the Customer to the database after validating it 
+    @return true if one record is added, false otherwise
+     */
+    public boolean addCustomer(Statement stmt, User currentUser)
+            throws SQLException {
+
+        Customer c = getCustomerInformation(stmt, currentUser);
+
+        //add customer to the database
+        stmt.executeUpdate(String.format("INSERT INTO customer(customerName, "
+                + "addressId, active, createDate, createdBy, lastUpdateBy) "
+                + "VALUES('%s', %d, 1, NOW(), '%s', '%s')", c.getCustomerName(),
+                c.getAddressId(), currentUser.getUserName(), currentUser.getUserName()));
+
+        return true;
+    }
+
+    /*
+    Gets the customer Id from the user, if found it then retrieves the new
+    customer information and updates the database, if the customer is
+    not found it returns false early
+    @return true if one record is updated, false otherwise
+     */
     public boolean updateCustomer(Statement stmt, User currentUser)
             throws SQLException {
 
@@ -122,43 +150,38 @@ public class CustomersManager {
         //update customer table
         int result = stmt.executeUpdate(String.format("UPDATE customer"
                 + " SET customerName='%s', addressId=%d, lastUpdate=NOW(), lastUpdateBy='%s'"
-                + " WHERE customerid=%d", c.getCustomerName(), c.getAddressId(), 
+                + " WHERE customerid=%d", c.getCustomerName(), c.getAddressId(),
                 currentUser.getUserName(), c.getCustomerId()));
 
         return result == 1;
     }
 
-    public boolean addCustomer(Statement stmt, User currentUser)
-            throws SQLException {
-
-        Customer c = getCustomerInformation(stmt, currentUser);
-
-        //add customer to the database
-        stmt.executeUpdate(String.format("INSERT INTO customer(customerName, "
-                + "addressId, active, createDate, createdBy, lastUpdateBy) "
-                + "VALUES('%s', %d, 1, NOW(), '%s', '%s')", c.getCustomerName(),
-                c.getAddressId(), currentUser.getUserName(), currentUser.getUserName()));
-
-        return true;
-    }
-
+    /*
+    Gets the customer Id from the user, if found it then deletes the corresponding
+    customer, if the customer is not found it returns false early
+    @return true if one record is deleted, false otherwise
+     */
     public boolean deleteCustomer(Statement stmt) throws SQLException {
-            //get cutomerid
-            System.out.print("Enter ID of the customer you would like to delete:  ");
-            int customerid = Integer.parseInt(sc.nextLine());
+        //get cutomerid
+        System.out.print("Enter ID of the customer you would like to delete:  ");
+        int customerid = Integer.parseInt(sc.nextLine());
 
-            if (!findCustomer(stmt, customerid)) {
-                System.out.println("No customer exists with that ID.");
-                return false;
-            }
+        if (!findCustomer(stmt, customerid)) {
+            System.out.println("No customer exists with that ID.");
+            return false;
+        }
 
-            //at this point, the customerid must exist
-            stmt.executeUpdate(String.format("DELETE FROM customer WHERE customerId=%d", customerid));
+        //at this point, the customerid must exist
+        stmt.executeUpdate(String.format("DELETE FROM customer WHERE customerId=%d", customerid));
 
         return true;
     }
 
-    public static boolean findCustomer(Statement stmt, int customerid) throws SQLException {
+    /*
+    Finds the customer associated with the passed in customerId
+    @return true if the customer is found, false otherwise
+     */
+    public boolean findCustomer(Statement stmt, int customerid) throws SQLException {
         boolean customerFound = false;
 
         ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM customer "
@@ -172,29 +195,57 @@ public class CustomersManager {
         return customerFound;
     }
 
-    private  void printCustomerRecord(String customerid, String customerName,
+    /*
+    Implements the test method in the Functional Interface Predicate
+     */
+    @Override
+    public boolean test(Object o) {
+        return o.toString().isEmpty();
+    }
+
+    /*
+    Prints out a customer record with the passed in information in a formatted fashion
+     */
+    private void printCustomerRecord(String customerid, String customerName,
             String addressId, String address, String cityId, String city, String countryId, String country) {
         System.out.printf("%-12s| %-45s| %-12s| %-50s| %-12s| %-50s| %-12s| %-50s|\n",
                 customerid, customerName, addressId, address, cityId, city, countryId, country);
     }
-    
+
+    /*
+    Checks if the passed in string is empty using the Predicate interface's 
+    implementation, throwing an IllegalArgumentException if the string is empty
+    */
     private void validate(String str) throws IllegalArgumentException {
-        if(str.isEmpty()) {
+        //lambda expression using a method reference
+        //makes the validation test more obvious
+        Predicate<String> p = String::isEmpty;
+
+        if (p.test(str)) {
             throw new IllegalArgumentException("Empty string entered for mandatory field");
         }
+
     }
-    
-    
+
+    /*
+    Calls another version of the same method with -1 as the customerId,
+    as it is not known to the program
+    */
     private Customer getCustomerInformation(Statement stmt,
             User currentUser) throws SQLException {
-        
+
         //use -1 when the customerId is not known by the program
         return getCustomerInformation(stmt, -1, currentUser);
     }
-    
+
+    /*
+    Gets the customer information from the user and creates a User object
+    with the information, also creates corresponding a address, city, and/or
+    country when necessary
+    */
     private Customer getCustomerInformation(Statement stmt, int customerId,
             User currentUser) throws SQLException {
-        
+
         //at this point the customerid must exist
         //acquire updated customer table fields for all tables
         System.out.print("Enter customer name: ");
@@ -222,7 +273,7 @@ public class CustomersManager {
 
             System.out.print("Enter postal code: ");
             String postalCode = sc.nextLine();
-            
+
             System.out.print("Enter phone: ");
             String phone = sc.nextLine();
             validate(phone);
@@ -269,14 +320,17 @@ public class CustomersManager {
             addAddress(stmt, addressId, address, cityId, postalCode, phone, currentUser);
 
         }
-        
+
         rs.close();
-        
+
         //return -1 as customerId because it is not currently known by the program
         //and is not needed
         return new Customer(customerId, name, addressId);
     }
 
+    /*
+    Adds an address record to the database
+    */
     private void addAddress(Statement stmt, int addressId, String address, int cityId, String postalCode,
             String phone, User currentUser) throws SQLException {
         stmt.executeUpdate(String.format("INSERT INTO address(addressId, address, cityId, postalCode, phone, "
@@ -285,6 +339,9 @@ public class CustomersManager {
 
     }
 
+    /*
+    Adds a city record to the database
+    */
     private void addCity(Statement stmt, int cityId, String city, int countryId,
             User currentUser) throws SQLException {
         stmt.executeUpdate(String.format("INSERT INTO city(cityId, city, countryId, createDate, "
@@ -293,10 +350,14 @@ public class CustomersManager {
 
     }
 
+    /*
+    Adds a country record to the database
+    */
     private void addCountry(Statement stmt, int countryId, String country,
             User currentUser) throws SQLException {
         stmt.executeUpdate(String.format("INSERT INTO country(countryId, country, createDate, "
                 + "createdBy, lastUpdateBy) VALUES(%d, '%s', NOW(), '%s', '%s')", countryId, country,
                 currentUser.getUserName(), currentUser.getUserName()));
     }
+
 }

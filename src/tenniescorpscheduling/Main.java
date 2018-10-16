@@ -3,18 +3,12 @@
  */
 package tenniescorpscheduling;
 
-import java.sql.ResultSet;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
-/**
- *
- * @author Joshua
- */
+
 public class Main {
 
     static Scanner sc = new Scanner(System.in);
@@ -31,8 +25,9 @@ public class Main {
         System.out.println(rb.getString("login"));
 
         User currentUser = null;
+        LoginManager lm = new LoginManager();
         do {
-            currentUser = LoginManager.attemptLogIn(rb);
+            currentUser = lm.attemptLogIn(rb);
             currentUser.printLogInAttemptToFile();
 
             if (!currentUser.isLoginSuccessful()) {
@@ -42,12 +37,12 @@ public class Main {
         } while (!currentUser.isLoginSuccessful());
 
         System.out.println(rb.getString("success"));
-        LoginManager.checkUpcomingAppointment(currentUser);
+        lm.checkUpcomingAppointment(currentUser);
 
         
         CustomersManager customersManager = new CustomersManager();
         AppointmentsManager apptsManager = new AppointmentsManager();
-        CalendarManager calendarManager = new CalendarManager(LocalDate.now());
+        CalendarManager calendarManager = new CalendarManager();
         ReportManager reportManager = new ReportManager();
         
         int generalChoice = -1;
@@ -80,7 +75,7 @@ public class Main {
                     reportManager.executeReportChoice(choice);
                     break;
                 case 5:
-                //exit program
+                //exit program, do nothing
                     break;
                 default:
                 //invalid value entered

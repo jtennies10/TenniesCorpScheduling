@@ -1,6 +1,6 @@
 /*
- * Defines the User class which is instantiated upon successful log in.
- * Only takes the necessary fields from the database needed for the program.
+ * Defines the User class, only takes the necessary fields from the 
+ * database needed for the program.
  */
 package tenniescorpscheduling;
 
@@ -11,14 +11,11 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Scanner;
 
-/**
- *
- * @author Joshua
- */
+
 class User {
 
-    final private static Scanner sc = new Scanner(System.in);
-    final private static File file = new File("userActivity.txt");
+    private Scanner sc = new Scanner(System.in);
+    final private File FILE_NAME = new File("userActivity.txt");
 
     final private boolean loginSuccessful;
     private int userid;
@@ -51,19 +48,24 @@ class User {
         return loginSuccessful;
     }
 
+    /*
+    Prints the log in attempt to the file with the User information
+    appending that the login was failed if the loginSuccessful member is 
+    set to false
+    */
     public void printLogInAttemptToFile() {
         try {
 
-            BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME, true));
 
-            if (!file.exists()) {
-                file.createNewFile();
+            if (!FILE_NAME.exists()) {
+                FILE_NAME.createNewFile();
             }
             
             bw.append(String.format("DateTime:%s Id:%d UserName:%s",
                         ZonedDateTime.now().toString(), userid, userName));
             
-            if(!isLoginSuccessful()) {
+            if(!loginSuccessful) {
                 bw.append(" - Failed");
             }
             

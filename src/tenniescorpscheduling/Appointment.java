@@ -4,27 +4,25 @@
 package tenniescorpscheduling;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
-/**
- *
- * @author Joshua
- */
 public class Appointment {
-   final private int appointmentId;
-   private int customerId;
-   private int userId;
-   private String title;
-   private String description;
-   private String location;
-   private String contact;
-   private String type;
-   private String url;
-   private LocalDateTime start;
-   private LocalDateTime end; 
+    //appointmentId is final because it is the primary key in the database,
+    //and therefore should not change
+    final private int appointmentId;
+    private int customerId;
+    private int userId;
+    private String title;
+    private String description;
+    private String location;
+    private String contact;
+    private String type;
+    private String url;
+    private LocalDateTime start;
+    private LocalDateTime end;
 
-    public Appointment(int appointmentId, int customerId, int userId, String title, 
-            String description, String location, String contact, String type, String url, 
+    
+    public Appointment(int appointmentId, int customerId, int userId, String title,
+            String description, String location, String contact, String type, String url,
             LocalDateTime start, LocalDateTime end) {
         this.appointmentId = appointmentId;
         this.customerId = customerId;
@@ -42,7 +40,7 @@ public class Appointment {
     public int getAppointmentId() {
         return appointmentId;
     }
-    
+
     public int getCustomerId() {
         return customerId;
     }
@@ -121,12 +119,12 @@ public class Appointment {
 
     public void setEnd(LocalDateTime end) {
         this.end = end;
-    } 
-    
-    @Override 
+    }
+
+    @Override
     public String toString() {
         return "ID: " + appointmentId + " Customer ID: " + customerId
                 + " at " + start.toString();
     }
-   
+
 }

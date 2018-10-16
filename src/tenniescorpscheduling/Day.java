@@ -5,15 +5,9 @@
 package tenniescorpscheduling;
 
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
-/**
- *
- * @author Joshua
- */
+
 public class Day {
     final private int dayOfMonth;
     final private DayOfWeek dayOfWeek;
@@ -45,6 +39,11 @@ public class Day {
         appointments.add(appt);
     }
     
+    /*
+    Overrides toString method returning a formatted string composed of 
+    string formatted with the formatAppointmentBlock method
+    @return the formatted string representing the Day object
+    */
     @Override
     public String toString() {
         return String.format("%-15s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s\n",
@@ -55,6 +54,11 @@ public class Day {
                 formatAppointmentBlock(16));
     }
     
+    /*
+    Formats the passed in hour with the possible appointments that start within that
+    hour, which are constrainted to only starting at increments of 15 minutes
+    @return the formatted hour
+    */
     private String formatAppointmentBlock(int hour) {
         String[] apptsInHour = {"","","",""};
         for(Appointment a : appointments) {

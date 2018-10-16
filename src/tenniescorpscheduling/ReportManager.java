@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Class managing the report options and processes user choices
  */
 package tenniescorpscheduling;
 
@@ -28,9 +26,13 @@ class ReportManager {
         System.out.println("4. Return to general options");
     }
 
+    /*
+    Serves as the controller for all of the report options,
+    catching exceptions and performing the user choices
+     */
     public void executeReportChoice(int userChoice) {
         try (Connection conn = DatabaseConnection.makeConnection();
-                Statement stmt = DatabaseConnection.conn.createStatement()) {
+                Statement stmt = DatabaseConnection.getConn().createStatement()) {
 
             switch (userChoice) {
                 case 1:
@@ -57,6 +59,10 @@ class ReportManager {
         }
     }
 
+    /*
+    Prints out the appointments by type for each month spanning from the current
+    month to each month in the following year
+     */
     private void generateAppointmentsByType(Statement stmt) throws SQLException {
         //get the first of the month, in the zeroth hour
         //subtract a month so that the current month is used
@@ -74,6 +80,8 @@ class ReportManager {
                     + "WHERE start BETWEEN '%s' AND '%s'", currentMonth,
                     currentMonth.with(TemporalAdjusters.lastDayOfMonth()).plusHours(23)));
 
+            //iterate through the result set, collecting the appointment types
+            //in their corresponding counters
             while (rs.next()) {
                 String type = rs.getString("type");
                 switch (type) {
@@ -103,7 +111,7 @@ class ReportManager {
     }
 
     /*
-    Generates a report of appointments grouped by consultant for the month
+    Generates a report of appointments grouped by consultant for the current month
      */
     private void generateAppointmentsByConsultant(Statement stmt) throws SQLException {
 
@@ -137,6 +145,10 @@ class ReportManager {
         }
     }
 
+    /*
+    Prints out the ratio of new customer appointment to returning customer appointments
+    for each month spanning from the current month to each month in the following year
+     */
     private void generateAppoinmentsByRatio(Statement stmt) throws SQLException {
         //get the first of the month, in the zeroth hour
         //subtract a month so that the current month is used
@@ -170,8 +182,10 @@ class ReportManager {
 
             rs.close();
 
+            //find the fcd between the two appointment types in order
+            //reduce the ratio to its lowest whole numbers
             int gcd = findGCD(newAppt, returningAppt);
-            
+
             System.out.println(currentMonth.getMonth() + " " + currentMonth.getYear());
             if (gcd != 0) {
                 newAppt /= gcd;
@@ -184,12 +198,15 @@ class ReportManager {
         }
     }
 
-    //Find the GCD using the well known Euclid's algorithm
+    /*
+    Find the GCD recursively using the well known Euclid's algorithm
+    @return the gcd
+     */
     private static int findGCD(int n1, int n2) {
-        if(n1 == 0 || n2 == 0) {
+        if (n1 == 0 || n2 == 0) {
             return 0;
         }
-        
+
         if (n1 % n2 == 0) {
             return n2;
         } else {

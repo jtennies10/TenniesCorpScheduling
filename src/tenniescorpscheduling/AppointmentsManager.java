@@ -1,6 +1,6 @@
 /*
  * Defines AppointmentsManager class, used to add, update, delete, and
- * view AppointmentsManager.
+ * view Appointments in the database.
  */
 package tenniescorpscheduling;
 
@@ -10,25 +10,20 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Scanner;
 
-/**
- *
- * @author Joshua
- */
+
 public class AppointmentsManager {
 
     static Scanner sc = new Scanner(System.in);
 
+    //empty constructor
     public AppointmentsManager() {
     }
-
+    
     public void printAppointmentOptions() {
         System.out.println("\nAppointment Options");
         System.out.println("1. View all appointments");
@@ -38,9 +33,13 @@ public class AppointmentsManager {
         System.out.println("5. Return to general options");
     }
 
+    /*
+    Serves as the controller for all of the appointment options,
+    catching exceptions and performing the user choices
+    */
     public void executeAppointmentChoice(int userChoice, User currentUser) {
         try (Connection conn = DatabaseConnection.makeConnection();
-                Statement stmt = DatabaseConnection.conn.createStatement()) {
+                Statement stmt = DatabaseConnection.getConn().createStatement()) {
 
             switch (userChoice) {
                 case 1:
@@ -78,16 +77,23 @@ public class AppointmentsManager {
             System.out.println("Error communicating with the database.");
             System.out.println(e.getMessage());
         } catch (InvalidAppointmentException e) {
+            //handles invalid appointment information entered by the user
             System.out.println("Appoiment details are not valid.");
             System.out.println(e.getMessage());
         }
         
     }
 
+    /*
+    Retrieves all appointments in the database, along with their corresponding
+    basic customer and user information, displaying each with a general
+    overview
+    */
     public void viewAllAppointments(Statement stmt) throws SQLException {
 
         printAppointmentRecord("Appointment ID", "Customer ID", "Customer Name", "User ID",
                 "UserName", "Type", "Start", "End");
+        
         //add a line for separting the header from the records
         System.out.println("----------------------------------------------"
                 + "--------------------------------------------------------"
@@ -98,6 +104,7 @@ public class AppointmentsManager {
                 + "customer ON appointment.customerId=customer.customerId INNER JOIN "
                 + "user ON appointment.userId=user.userId ORDER BY appointmentId");
 
+        //iterate through each record in the resultset
         while (rs.next()) {
             //convert stored UTC times to the users time zone
             Timestamp storedStartTimeStamp = rs.getTimestamp("start");
@@ -115,6 +122,11 @@ public class AppointmentsManager {
 
     }
 
+    /*
+    Uses the getAppointmentInformation method to get an Appointment object,
+    then adds the Appointment to the database after validating it 
+    @return true if one record is added, false otherwise
+    */
     public boolean addAppointment(Statement stmt, User currentUser) throws SQLException {
 
         Appointment appt = getAppointmentInformation(stmt, currentUser);
@@ -132,13 +144,15 @@ public class AppointmentsManager {
                 appt.getEnd().toString(), currentUser.getUserName(),
                 currentUser.getUserName()));
 
-        if (result != 1) {
-            return false;
-        }
-
-        return true;
+        return result == 1;
     }
 
+    /*
+    Gets the appoinment Id from the user, if found it then retrieves the new
+    appointment information and updates the database, if the apopintment is
+    not found it returns false early
+    @return true if one record is updated, false otherwise
+    */
     public boolean updateAppointment(Statement stmt, User currentUser) throws SQLException {
 
         System.out.print("Enter appointment ID: ");
@@ -165,13 +179,14 @@ public class AppointmentsManager {
                 appt.getTitle(), appt.getDescription(), appt.getLocation(), appt.getType(),
                 appt.getStart(), appt.getEnd(), currentUser.getUserName(), appointmentId));
 
-        if (result != 1) {
-            return false;
-        }
-
-        return true;
+        return result == 1;
     }
 
+    /*
+    Gets the appoinment Id from the user, if found it then deletes the corresponding
+    appointment, if the appointment is not found it returns false early
+    @return true if one record is deleted, false otherwise
+    */
     public static boolean deleteAppointment(Statement stmt) throws SQLException {
 
         System.out.print("Enter appointment ID: ");
@@ -185,19 +200,23 @@ public class AppointmentsManager {
         int result = stmt.executeUpdate(String.format(
                 "DELETE FROM appointment WHERE appointmentId=%d", appointmentId));
 
-        if (result != 1) {
-            return false;
-        }
-
-        return true;
+        return result == 1;
     }
 
+    /*
+    Prints out an appointment record with the passed in information in a formatted fashion
+    */
     private static void printAppointmentRecord(String appointmentId, String customerId,
             String customerName, String userId, String userName, String type, String start, String end) {
         System.out.printf("%-14s| %-13s| %-35s| %-13s| %-35s|  %-20s| %-25s| %-25s\n",
                 appointmentId, customerId, customerName, userId, userName, type, start, end);
     }
 
+    /*
+    Asks the user for the type of appointment and returns the corresponding
+    type, this helps control the appointment types within the database 
+    @return a String representing the appointment type
+    */
     private static String getAppointmentType() {
 
         System.out.println("What type of appointment is this?");
@@ -222,23 +241,32 @@ public class AppointmentsManager {
         }
     }
 
-    private static ZonedDateTime getStartTimeInUTC() {
-        //first get the local date and time
+    /*
+    Prompts the user to enter the time of appointment, placing restrictions
+    on the possible start minutes
+    @return the LocalDateTime converted to UTC time
+    */
+    private static LocalDateTime getStartTimeInUTC() {
+        //first get the local date and time of the appointment
         System.out.print("Enter appointment start time in the following format"
                 + "\nNote - Start time must be at 00, 15, 30, or 45 minutes"
                 + "\n(YYYY MM DD HH mm): ");
-        ZonedDateTime local = ZonedDateTime.of(sc.nextInt(), sc.nextInt(),
-                sc.nextInt(), sc.nextInt(), sc.nextInt(), 0, 0, ZoneId.systemDefault());
+        LocalDateTime local = LocalDateTime.of(sc.nextInt(), sc.nextInt(),
+                sc.nextInt(), sc.nextInt(), sc.nextInt());
 
         sc.nextLine(); //just clears the new line character from the input stream
 
         //get the zone offset
-        ZoneOffset offset = local.getOffset();
+        ZoneOffset offset = ZonedDateTime.now().getOffset();
 
         //return the converted time
         return local.minusSeconds(offset.getTotalSeconds());
     }
 
+    /*
+    Finds the appointment associated with the passed in appointmentId
+    @return true if the appointment is found, false otherwise
+    */
     private static boolean findAppointment(Statement stmt, int appointmentId) throws SQLException {
 
         boolean apptFound = false;
@@ -253,15 +281,23 @@ public class AppointmentsManager {
         return apptFound;
     }
 
+    //calls another version of the same method with -1 as the customerId
+    //since it is unknown currently to the program
     private static Appointment getAppointmentInformation(Statement stmt, User currentUser) throws SQLException {
         return getAppointmentInformation(stmt, -1, currentUser);
     }
 
+    /*
+    Gets the appointment information and populates an Appointment object with it
+    @return an Appointment object holding the information entered by the user
+    */
     private static Appointment getAppointmentInformation(Statement stmt,
             int customerId, User currentUser) throws SQLException {
 
         ResultSet rs;
 
+        //if the customerId is -1, it was unknown at the time of the program
+        //call and needs found
         if (customerId == -1) {
             System.out.print("Enter ID of customer the appointment is for: ");
             customerId = Integer.parseInt(sc.nextLine());
@@ -297,14 +333,12 @@ public class AppointmentsManager {
 
         String type = getAppointmentType();
 
-        //get the start time in UTC and then break it down into 
-        //localdate and localtime
-        ZonedDateTime start = getStartTimeInUTC();
-        LocalDateTime localStartTimeInUTC = start.toLocalDateTime();
+        //get the start time in UTC 
+        LocalDateTime localStartTimeInUTC = getStartTimeInUTC();
 
         //get appointment length and add it to startTimeInUTC
         //to get endTimeInUTC
-        System.out.print("Enter length of appointment in minutes(15, 30, 45, or 60): ");
+        System.out.print("Enter length of appointment in minutes(length should be an increment of 15 minutes): ");
         int lengthInMinutes = Integer.parseInt(sc.nextLine());
         LocalDateTime localEndTimeInUTC = localStartTimeInUTC.plusMinutes(lengthInMinutes);
 
@@ -314,6 +348,13 @@ public class AppointmentsManager {
                 location, contact, type, "", localStartTimeInUTC, localEndTimeInUTC);
     }
 
+    
+    /*
+    Checks for appointment outside of business hours,
+    appointment not starting and ending on an increment of 15 minutes,
+    or appointment overlapping with an existing appointment,
+    throwing an InvalidAppointmentException if any of these cases are found
+    */
     private static void validate(Statement stmt, Appointment appt) 
             throws InvalidAppointmentException, SQLException {
         //check if appointment is outside business hours

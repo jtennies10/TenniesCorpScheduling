@@ -3,11 +3,9 @@
  */
 package tenniescorpscheduling;
 
-/**
- *
- * @author Joshua
- */
 public class Customer {
+    //customerId is final because it is the primary key in customer
+    //table in database and therefore cannot change
     final private int customerId;
     private String customerName;
     private int addressId;

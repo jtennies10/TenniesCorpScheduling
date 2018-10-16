@@ -5,23 +5,19 @@ package tenniescorpscheduling;
 
 import java.time.LocalDate;
 
-/**
- *
- * @author Joshua
- */
+
 public class CalendarManager {
-
-    final LocalDate startDate;
-    int monthOffset;
     
- 
-
-    public CalendarManager(LocalDate startDate) {
-        this.startDate = startDate;
+    public CalendarManager() {
     }
 
+    /*
+    Opens the calendar and loops through, performing various modifications
+    until the user chooses to quit the calendar
+    */
     public void openCalendar(User currentUser) {
         int choice = -1;
+        //create a CustomMonth object with the current date
         CustomMonth cm = new CustomMonth(LocalDate.now(), currentUser);
         do {
             
@@ -32,7 +28,7 @@ public class CalendarManager {
             
             switch (choice) {
                 case 1:
-                    //switch calendar and display
+                    //switch calendar display type
                     System.out.println("Switch");
                     cm.changeViewType();
 
