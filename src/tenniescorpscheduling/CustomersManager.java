@@ -215,7 +215,7 @@ public class CustomersManager implements Predicate {
     /*
     Checks if the passed in string is empty using the Predicate interface's 
     implementation, throwing an IllegalArgumentException if the string is empty
-    */
+     */
     private void validate(String str) throws IllegalArgumentException {
         //lambda expression using a method reference
         //makes the validation test more obvious
@@ -230,7 +230,7 @@ public class CustomersManager implements Predicate {
     /*
     Calls another version of the same method with -1 as the customerId,
     as it is not known to the program
-    */
+     */
     private Customer getCustomerInformation(Statement stmt,
             User currentUser) throws SQLException {
 
@@ -242,7 +242,7 @@ public class CustomersManager implements Predicate {
     Gets the customer information from the user and creates a User object
     with the information, also creates corresponding a address, city, and/or
     country when necessary
-    */
+     */
     private Customer getCustomerInformation(Statement stmt, int customerId,
             User currentUser) throws SQLException {
 
@@ -253,7 +253,9 @@ public class CustomersManager implements Predicate {
         validate(name);
 
         System.out.print("Enter customer addressId: ");
-        int addressId = Integer.parseInt(sc.nextLine());
+        String addressIdAsString = sc.nextLine();
+        validate(addressIdAsString);
+        int addressId = Integer.parseInt(addressIdAsString);
 
         //check if the customerAddressId already exists for an address record,
         //if so return true
@@ -269,8 +271,11 @@ public class CustomersManager implements Predicate {
             validate(address);
 
             System.out.print("Enter cityId: ");
-            int cityId = Integer.parseInt(sc.nextLine());
+            String cityIdAsString = sc.nextLine();
+            validate(cityIdAsString);
+            int cityId = Integer.parseInt(cityIdAsString);
 
+            //postalCode is not mandatory, so it is not validated
             System.out.print("Enter postal code: ");
             String postalCode = sc.nextLine();
 
@@ -292,7 +297,9 @@ public class CustomersManager implements Predicate {
                 validate(city);
 
                 System.out.print("Enter countryId: ");
-                int countryId = Integer.parseInt(sc.nextLine());
+                String countryIdAsString = sc.nextLine();
+                validate(countryIdAsString);
+                int countryId = Integer.parseInt(countryIdAsString);
 
                 //check if the countryId already exists for a country record,
                 //if so return true
@@ -330,7 +337,7 @@ public class CustomersManager implements Predicate {
 
     /*
     Adds an address record to the database
-    */
+     */
     private void addAddress(Statement stmt, int addressId, String address, int cityId, String postalCode,
             String phone, User currentUser) throws SQLException {
         stmt.executeUpdate(String.format("INSERT INTO address(addressId, address, cityId, postalCode, phone, "
@@ -341,7 +348,7 @@ public class CustomersManager implements Predicate {
 
     /*
     Adds a city record to the database
-    */
+     */
     private void addCity(Statement stmt, int cityId, String city, int countryId,
             User currentUser) throws SQLException {
         stmt.executeUpdate(String.format("INSERT INTO city(cityId, city, countryId, createDate, "
@@ -352,7 +359,7 @@ public class CustomersManager implements Predicate {
 
     /*
     Adds a country record to the database
-    */
+     */
     private void addCountry(Statement stmt, int countryId, String country,
             User currentUser) throws SQLException {
         stmt.executeUpdate(String.format("INSERT INTO country(countryId, country, createDate, "
