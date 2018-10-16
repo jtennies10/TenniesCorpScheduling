@@ -12,6 +12,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Arrays;
 
 /**
  *
@@ -148,31 +149,11 @@ public class CustomMonth {
     private void displayMonth() {
         printHeader();
 
-        //obtain the first and last days of the month
-        //the first is called upTo as it will iterate through the month
-//        LocalDate upTo = currentDate.with(TemporalAdjusters.firstDayOfMonth());
-//        LocalDate lastOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
-//        Period p = Period.ofDays(1);
-//
-//        while (upTo.getDayOfMonth() != lastOfMonth.getDayOfMonth()) {
-//            printDay(upTo);
-//            upTo = upTo.plus(p);
-//        }
-//
-//        //the last day of the month still needs printed out
-//        printDayOfMonth(lastOfMonth);
-
-          //get the last day of the month and iterate through the month,
-          //printing each day
-//          int lastOfMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
-//          
-//          for(int i = 0; i < lastOfMonth; i++) {
-//              printDayOfMonth(i);
-//          }
+        //lambda expression that simplifies printing out the days of the month
+        //using a method reference
+        Arrays.asList(daysInCurrentMonth).forEach(System.out::println);
           
-          for(Day d : daysInCurrentMonth) {
-              System.out.println(d);
-          }
+          
 
     }
 

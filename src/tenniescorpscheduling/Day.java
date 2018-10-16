@@ -45,7 +45,6 @@ public class Day {
         appointments.add(appt);
     }
     
-    //TODO:override toString method
     @Override
     public String toString() {
         return String.format("%-15s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s|%-24s\n",
