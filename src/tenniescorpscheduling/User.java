@@ -23,12 +23,15 @@ class User {
     final private boolean loginSuccessful;
     private int userid;
     private String userName;
+    
+    public User(int userId, String userName) {
+        this(userId, userName, false);
+    }
 
     public User(int userid, String userName, boolean logInSuccessful) {
         this.userid = userid;
         this.userName = userName;
         this.loginSuccessful = logInSuccessful;
-        printLogInAttemptToFile();
     }
 
     public int getUserId() {
@@ -48,7 +51,7 @@ class User {
         return loginSuccessful;
     }
 
-    private void printLogInAttemptToFile() {
+    public void printLogInAttemptToFile() {
         try {
 
             BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
@@ -72,6 +75,11 @@ class User {
             System.out.println("There was an error writing the login attempt to "
                     + "the user activity file.");
         }
+    }
+    
+    @Override
+    public String toString() {
+        return userid + " " + userName;
     }
 
 }
