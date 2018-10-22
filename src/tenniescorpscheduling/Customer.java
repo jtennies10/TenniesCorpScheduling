@@ -9,11 +9,13 @@ public class Customer {
     final private int customerId;
     private String customerName;
     private int addressId;
+    private boolean active;
 
-    public Customer(int customerId, String customerName, int addressId) {
+    public Customer(int customerId, String customerName, int addressId, boolean active) {
         this.customerId = customerId;
         this.customerName = customerName;
         this.addressId = addressId;
+        this.active = active;
     }
 
     public int getCustomerId() {
@@ -34,6 +36,15 @@ public class Customer {
 
     public void setAddressId(int addressId) {
         this.addressId = addressId;
+    }
+    
+    public int isActive() {
+        if(active) return 1;
+        else return 0;
+    }
+    
+    public void setActive(boolean active) {
+        this.active = active;
     }
         
 }

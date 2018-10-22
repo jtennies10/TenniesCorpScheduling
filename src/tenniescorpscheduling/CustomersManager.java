@@ -88,18 +88,18 @@ public class CustomersManager implements Predicate {
                 + "address.cityId = city.cityId INNER JOIN country ON "
                 + "city.countryId = country.countryId ORDER BY customerId");
 
-        printCustomerRecord("Customer ID", "Customer Name", "Address ID",
+        printCustomerRecord("Customer ID", "Customer Name", "Active", "Address ID",
                 "Address", "City ID", "City", "Country ID", "Country");
         //add a line for separting the header from the records
         System.out.println("----------------------------------------------"
                 + "--------------------------------------------------------"
                 + "--------------------------------------------------------"
-                + "--------------------------------------------------------");
+                + "----------------------------------------------------------------");
 
         while (rs.next()) {
             //print out each customer info
             printCustomerRecord(String.valueOf(rs.getInt("customerid")),
-                    rs.getString("customerName"), String.valueOf(rs.getInt("addressId")),
+                    rs.getString("customerName"), String.valueOf(rs.getInt("active")), String.valueOf(rs.getInt("addressId")),
                     rs.getString("address"), rs.getString("cityId"), rs.getString("city"),
                     String.valueOf(rs.getString("countryId")), rs.getString("country"));
 
@@ -120,8 +120,8 @@ public class CustomersManager implements Predicate {
         //add customer to the database
         stmt.executeUpdate(String.format("INSERT INTO customer(customerName, "
                 + "addressId, active, createDate, createdBy, lastUpdateBy) "
-                + "VALUES('%s', %d, 1, NOW(), '%s', '%s')", c.getCustomerName(),
-                c.getAddressId(), currentUser.getUserName(), currentUser.getUserName()));
+                + "VALUES('%s', %d, %d, NOW(), '%s', '%s')", c.getCustomerName(),
+                c.getAddressId(), c.isActive(), currentUser.getUserName(), currentUser.getUserName()));
 
         return true;
     }
@@ -149,8 +149,8 @@ public class CustomersManager implements Predicate {
 
         //update customer table
         int result = stmt.executeUpdate(String.format("UPDATE customer"
-                + " SET customerName='%s', addressId=%d, lastUpdate=NOW(), lastUpdateBy='%s'"
-                + " WHERE customerid=%d", c.getCustomerName(), c.getAddressId(),
+                + " SET customerName='%s', addressId=%d, active=%d, lastUpdate=NOW(), lastUpdateBy='%s'"
+                + " WHERE customerid=%d", c.getCustomerName(), c.getAddressId(), c.isActive(),
                 currentUser.getUserName(), c.getCustomerId()));
 
         return result == 1;
@@ -206,10 +206,10 @@ public class CustomersManager implements Predicate {
     /*
     Prints out a customer record with the passed in information in a formatted fashion
      */
-    private void printCustomerRecord(String customerid, String customerName,
+    private void printCustomerRecord(String customerid, String customerName, String active,
             String addressId, String address, String cityId, String city, String countryId, String country) {
-        System.out.printf("%-12s| %-45s| %-12s| %-50s| %-12s| %-50s| %-12s| %-50s|\n",
-                customerid, customerName, addressId, address, cityId, city, countryId, country);
+        System.out.printf("%-12s| %-45s| %-12s| %-12s| %-50s| %-12s| %-50s| %-12s| %-50s|\n",
+                customerid, customerName, active, addressId, address, cityId, city, countryId, country);
     }
 
     /*
@@ -251,6 +251,12 @@ public class CustomersManager implements Predicate {
         System.out.print("Enter customer name: ");
         String name = sc.nextLine();
         validate(name);
+        
+        
+        System.out.println("Is this customer active (Y or N)?");
+        char activeAsChar = Character.toUpperCase(sc.nextLine().charAt(0));
+        boolean active = activeAsChar == 'Y';
+                
 
         System.out.print("Enter customer addressId: ");
         String addressIdAsString = sc.nextLine();
@@ -261,6 +267,8 @@ public class CustomersManager implements Predicate {
         //if so return true
         ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM address WHERE "
                 + "addressId=%d", addressId));
+        
+        
 
         if (!rs.next()) { //then an address was not found and needs created
 
@@ -269,6 +277,9 @@ public class CustomersManager implements Predicate {
             System.out.print("Enter address: ");
             String address = sc.nextLine();
             validate(address);
+            
+            System.out.println("Enter address 2(enter for none): ");
+            String addressTwo = sc.nextLine();
 
             System.out.print("Enter cityId: ");
             String cityIdAsString = sc.nextLine();
@@ -276,7 +287,7 @@ public class CustomersManager implements Predicate {
             int cityId = Integer.parseInt(cityIdAsString);
 
             //postalCode is not mandatory, so it is not validated
-            System.out.print("Enter postal code: ");
+            System.out.print("Enter postal code(enter for none): ");
             String postalCode = sc.nextLine();
 
             System.out.print("Enter phone: ");
@@ -324,7 +335,7 @@ public class CustomersManager implements Predicate {
             }
 
             //the address can now be added since city has been added
-            addAddress(stmt, addressId, address, cityId, postalCode, phone, currentUser);
+            addAddress(stmt, addressId, address, addressTwo, cityId, postalCode, phone, currentUser);
 
         }
 
@@ -332,17 +343,17 @@ public class CustomersManager implements Predicate {
 
         //return -1 as customerId because it is not currently known by the program
         //and is not needed
-        return new Customer(customerId, name, addressId);
+        return new Customer(customerId, name, addressId, active);
     }
 
     /*
     Adds an address record to the database
      */
-    private void addAddress(Statement stmt, int addressId, String address, int cityId, String postalCode,
+    private void addAddress(Statement stmt, int addressId, String address, String addressTwo, int cityId, String postalCode,
             String phone, User currentUser) throws SQLException {
-        stmt.executeUpdate(String.format("INSERT INTO address(addressId, address, cityId, postalCode, phone, "
-                + "createDate, createdBy, lastUpdateBy) VALUES(%d, '%s', %d, '%s', '%s', NOW(), '%s', '%s')",
-                addressId, address, cityId, postalCode, phone, currentUser.getUserName(), currentUser.getUserName()));
+        stmt.executeUpdate(String.format("INSERT INTO address(addressId, address, address2, cityId, postalCode, phone, "
+                + "createDate, createdBy, lastUpdateBy) VALUES(%d, '%s', '%s', '%s', '%s', NOW(), '%s', '%s')",
+                addressId, address, addressTwo, cityId, postalCode, phone, currentUser.getUserName(), currentUser.getUserName()));
 
     }
 
