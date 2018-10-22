@@ -92,7 +92,7 @@ public class AppointmentsManager {
     public void viewAllAppointments(Statement stmt) throws SQLException {
 
         printAppointmentRecord("Appointment ID", "Customer ID", "Customer Name", "User ID",
-                "UserName", "Type", "Start", "End");
+                "UserName", "Type", "Start", "End", "URL");
         
         //add a line for separting the header from the records
         System.out.println("----------------------------------------------"
@@ -117,7 +117,8 @@ public class AppointmentsManager {
             printAppointmentRecord(String.valueOf(rs.getInt("appointmentId")),
                     String.valueOf(rs.getInt("customerId")), rs.getString("customerName"),
                     String.valueOf(rs.getInt("userId")), rs.getString("userName"),
-                    rs.getString("type"), localStartDateTime.toString(), localEndDateTime.toString());
+                    rs.getString("type"), localStartDateTime.toString(), localEndDateTime.toString(),
+                    rs.getString("url"));
         }
 
     }
@@ -137,10 +138,10 @@ public class AppointmentsManager {
 
         int result = stmt.executeUpdate(String.format("INSERT INTO "
                 + "appointment(customerId, userId, title, description, location, "
-                + "contact, type, start, end, createDate, createdBy, lastUpdateBy) "
-                + "VALUES(%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW(),"
+                + "contact, type, url, start, end, createDate, createdBy, lastUpdateBy) "
+                + "VALUES(%d, %d, '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', NOW(),"
                 + "'%s', '%s')", appt.getCustomerId(), currentUser.getUserId(), appt.getTitle(), appt.getDescription(),
-                appt.getLocation(), appt.getContact(), appt.getType(), appt.getStart().toString(),
+                appt.getLocation(), appt.getContact(), appt.getType(), appt.getUrl(), appt.getStart().toString(),
                 appt.getEnd().toString(), currentUser.getUserName(),
                 currentUser.getUserName()));
 
@@ -164,7 +165,7 @@ public class AppointmentsManager {
         }
         
         ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM appointment "
-                + "WHERE appoinmentId=%d", appointmentId));
+                + "WHERE appointmentId=%d", appointmentId));
         
         rs.first();
         int userId = rs.getInt("userId");
@@ -174,9 +175,9 @@ public class AppointmentsManager {
 
         int result = stmt.executeUpdate(String.format(
                 "UPDATE appointment SET title='%s', description='%s', location='%s', "
-                + "type='%s', start='%s', end='%s', lastUpdate=NOW(), lastUpdateBy='%s' "
+                + "type='%s', url='%s', start='%s', end='%s', lastUpdate=NOW(), lastUpdateBy='%s' "
                 + "WHERE appointmentId='%s'",
-                appt.getTitle(), appt.getDescription(), appt.getLocation(), appt.getType(),
+                appt.getTitle(), appt.getDescription(), appt.getLocation(), appt.getType(), appt.getUrl(),
                 appt.getStart(), appt.getEnd(), currentUser.getUserName(), appointmentId));
 
         return result == 1;
@@ -207,9 +208,10 @@ public class AppointmentsManager {
     Prints out an appointment record with the passed in information in a formatted fashion
     */
     private static void printAppointmentRecord(String appointmentId, String customerId,
-            String customerName, String userId, String userName, String type, String start, String end) {
-        System.out.printf("%-14s| %-13s| %-35s| %-13s| %-35s|  %-20s| %-25s| %-25s\n",
-                appointmentId, customerId, customerName, userId, userName, type, start, end);
+            String customerName, String userId, String userName, String type, String start,
+            String end, String url) {
+        System.out.printf("%-14s| %-13s| %-35s| %-13s| %-35s|  %-20s| %-25s| %-25s | %-25s\n",
+                appointmentId, customerId, customerName, userId, userName, type, start, end, url);
     }
 
     /*
@@ -330,6 +332,9 @@ public class AppointmentsManager {
         String contact = rs.getString("phone");
 
         rs.close();
+        
+        System.out.println("Enter appointment url(enter for none)");
+        String url = sc.nextLine();
 
         String type = getAppointmentType();
 
@@ -345,7 +350,7 @@ public class AppointmentsManager {
         //the appointmentId is set to zero to denote it is not currently known
         //by the program
         return new Appointment(0, customerId, currentUser.getUserId(), title, description,
-                location, contact, type, "", localStartTimeInUTC, localEndTimeInUTC);
+                location, contact, type, url, localStartTimeInUTC, localEndTimeInUTC);
     }
 
     

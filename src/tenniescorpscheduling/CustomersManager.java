@@ -326,17 +326,18 @@ public class CustomersManager implements Predicate {
                     validate(country);
 
                     addCountry(stmt, countryId, country, currentUser);
+                    System.out.println("Country added");
 
                 }
 
                 //the city can now be added since country has been added
                 addCity(stmt, cityId, city, countryId, currentUser);
-
+                System.out.println("city added");
             }
 
             //the address can now be added since city has been added
             addAddress(stmt, addressId, address, addressTwo, cityId, postalCode, phone, currentUser);
-
+            System.out.println("adress added");
         }
 
         rs.close();
@@ -352,7 +353,7 @@ public class CustomersManager implements Predicate {
     private void addAddress(Statement stmt, int addressId, String address, String addressTwo, int cityId, String postalCode,
             String phone, User currentUser) throws SQLException {
         stmt.executeUpdate(String.format("INSERT INTO address(addressId, address, address2, cityId, postalCode, phone, "
-                + "createDate, createdBy, lastUpdateBy) VALUES(%d, '%s', '%s', '%s', '%s', NOW(), '%s', '%s')",
+                + "createDate, createdBy, lastUpdateBy) VALUES(%d, '%s', '%s', %d, '%s', '%s', NOW(), '%s', '%s')",
                 addressId, address, addressTwo, cityId, postalCode, phone, currentUser.getUserName(), currentUser.getUserName()));
 
     }
