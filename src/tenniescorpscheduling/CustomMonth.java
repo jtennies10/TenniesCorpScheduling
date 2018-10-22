@@ -138,8 +138,8 @@ public class CustomMonth {
 
             //get all the appointments that fall within the month
             ResultSet rs = stmt.executeQuery(String.format("SELECT * FROM appointment "
-                    + "WHERE (start BETWEEN '%s' AND '%s')", firstOfMonth.toString(),
-                    lastOfMonth.toString()));
+                    + "WHERE (start BETWEEN '%s' AND '%s') AND userId=%d", firstOfMonth.toString(),
+                    lastOfMonth.toString(), currentUser.getUserId()));
 
             //add their appointments to their appropriate days
             while (rs.next()) {
